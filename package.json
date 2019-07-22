@@ -1,0 +1,19 @@
+{
+  "name": "teams-mechanic",
+  "version": "0.0.1",
+  "description": "A companion app to the Teams desktop app.",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "start": "npm run build && electron ./dist/main.js"
+  },
+  "devDependencies": {
+    "@types/event-stream": "^3.3.34",
+    "@types/node": "^12.6.8",
+    "electron": "^2.0.2",
+    "event-stream": "^4.0.1",
+    "tslint": "^5.10.0",
+    "typescript": "^2.8.3"
+  }
+}
