@@ -48,8 +48,8 @@ export function start() {
                     // tslint:disable-next-line: no-console
                     console.error(errors);
                 }
-                tabulatorLogs(logLines);
-                // clusterizeLogs(logLines);
+                // tabulatorLogs(logLines);
+                clusterizeLogs(logLines);
             }),
         );
 }
