@@ -10,6 +10,7 @@ export function start(file: string) {
     const regex = /^(\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT[+-]\d{4}) \([A-Za-z .]+\) <(\d+)> -- (\w+) -- (.+)/;
     let lineCount = 0;
     let logLines: LogLine[] = [];
+    const allLogs: LogLine[] = [];
     const errors: string[] = [];
     let map:Map<string, Process> = new Map<string, Process>();
 
@@ -17,6 +18,7 @@ export function start(file: string) {
     console.time("Log Parsing");
     let currentPid:string = undefined;
     let currentClientVersion: string = undefined;
+    let count:string[];
     fs.createReadStream(file)
         .pipe(eventStream.split())
         .pipe(
@@ -37,13 +39,12 @@ export function start(file: string) {
                         logLines = [];
                         currentPid = result[2];
                         currentClientVersion = undefined;
-                    } else {
-                        let index = result[4].indexOf('Client version is:');
-                        if(index>0){
-                            currentClientVersion = result[4].substr(index);
-                        }
+                    } else if(!currentClientVersion) {
+                        let index = result[4].indexOf("Client version is:");
+                        if(index > -1) currentClientVersion = result[4].substring(index+19);
                     }
                     logLines.push(logLine);
+                    allLogs.push(logLine);
                 } catch (error) {
                     logLines.length > 0 ? logLines[logLines.length - 1].appendToMessage(line) : errors.push(line);
                 }
@@ -58,14 +59,14 @@ export function start(file: string) {
                 // tslint:disable-next-line: no-console
                 map.set(currentPid, new Process(currentPid,logLines,currentClientVersion));
                 console.log(map);
-                console.log(lineCount);
+                console.log(count);
                 // tslint:disable-next-line: no-console
-                console.log(logLines);
+                console.log(allLogs);
                 if (errors.length > 0) {
                     // tslint:disable-next-line: no-console
                     console.error(errors);
                 }
-                tabulatorLogs(logLines);
+                tabulatorLogs(allLogs);
             }),
         );
 }
