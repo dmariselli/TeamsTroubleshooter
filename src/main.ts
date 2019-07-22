@@ -1,9 +1,127 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu, shell, dialog } from "electron";
 import * as path from "path";
+import * as MacMenu from "./lib/macMenus"
 
 let mainWindow: Electron.BrowserWindow;
 
+let template = [{
+  label: 'View',
+  submenu: [{
+    label: 'Reload',
+    accelerator: 'CmdOrCtrl+R',
+    click: (item: any, focusedWindow: { id: number; reload: () => void; }) => {
+      if (focusedWindow) {
+        // on reload, start fresh and close any old
+        // open secondary windows
+        if (focusedWindow.id === 1) {
+          BrowserWindow.getAllWindows().forEach(win => {
+            if (win.id > 1) win.close()
+          })
+        }
+        focusedWindow.reload()
+      }
+    }
+  }, 
+  {
+    label: 'Toggle Full Screen',
+    accelerator: (() => {
+      if (process.platform === 'darwin') {
+        return 'Ctrl+Command+F'
+      } else {
+        return 'F11'
+      }
+    })(),
+    click: (item: any, focusedWindow: { setFullScreen: (arg0: boolean) => void; isFullScreen: () => boolean; }) => {
+      if (focusedWindow) {
+        focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
+      }
+    }
+  }, {
+    label: 'Toggle Developer Tools',
+    accelerator: (() => {
+      if (process.platform === 'darwin') {
+        return 'Alt+Command+I'
+      } else {
+        return 'Ctrl+Shift+I'
+      }
+    })(),
+    click: (item: any, focusedWindow: { toggleDevTools: () => void; }) => {
+      if (focusedWindow) {
+        focusedWindow.toggleDevTools()
+      }
+    }
+  }, {
+    type: 'separator'
+  }, {
+    label: 'App Version',
+    click: function (item: any, focusedWindow: any) {
+      if (focusedWindow) {
+        const options = {
+          type: 'info',
+          title: 'App Version',
+          buttons: ['Ok'],
+          message: 'App version 0.0.1'
+        }
+        dialog.showMessageBox(focusedWindow, options, function () {})
+      }
+    }
+  }]
+},
+{
+  label: 'Manage Files',
+  submenu: [{
+    label: 'Open',
+    accelerator: 'CmdOrCtrl+O',
+    click: (item: any, focusedWindow: any) => {
+      dialog.showOpenDialog({
+        properties: ['openFile']
+      }, (files) => {
+        console.error(files);
+          if (files !== undefined) {
+            console.error(files);
+          }
+        });
+      }
+    }]
+  },
+{
+  label: 'Window',
+  role: 'window',
+  submenu: [{
+    label: 'Minimize',
+    accelerator: 'CmdOrCtrl+M',
+    role: 'minimize'
+  }, {
+    label: 'Close',
+    accelerator: 'CmdOrCtrl+W',
+    role: 'close'
+  }, {
+    type: 'separator'
+  }, {
+    label: 'Reopen Window',
+    accelerator: 'CmdOrCtrl+Shift+T',
+    enabled: false,
+    key: 'reopenMenuItem',
+    click: () => {
+      app.emit('activate')
+    }
+  }]
+}, {
+  label: 'Help',
+  role: 'help',
+  submenu: [{
+    label: 'Open Teams',
+    click: () => {
+      shell.openExternal('https://teams.microsoft.com');
+    }
+  }]
+}] as Electron.MenuItemConstructorOptions[];
+
+
 function createWindow() {
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+
   // Create the browser window.
   mainWindow = new BrowserWindow({
     height: 1200,
