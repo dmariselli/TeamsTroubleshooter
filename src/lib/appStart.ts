@@ -3,7 +3,7 @@ import * as eventStream from "event-stream";
 import * as fs from "fs";
 import { LogLine } from "./logLine";
 
-export function start() {
+export function start(file: string) {
 
     // tslint:disable-next-line: max-line-length
     const regex = /^(\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT[+-]\d{4}) \([A-Za-z .]+\) <(\d+)> -- (\w+) -- (.+)/;
@@ -14,7 +14,7 @@ export function start() {
     // tslint:disable-next-line: no-console
     console.time("Log Parsing");
 
-    fs.createReadStream("/Downloads/logs.txt")
+    fs.createReadStream(file)
         .pipe(eventStream.split())
         .pipe(
             eventStream.mapSync((line: any) => {
