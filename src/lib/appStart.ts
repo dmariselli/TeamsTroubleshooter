@@ -48,8 +48,7 @@ export function start(file: string) {
                     // tslint:disable-next-line: no-console
                     console.error(errors);
                 }
-                // tabulatorLogs(logLines);
-                clusterizeLogs(logLines);
+                tabulatorLogs(logLines);
             }),
         );
 }
@@ -63,7 +62,7 @@ function tabulatorLogs(logLines: LogLine[]) {
             {title: "Type", field: "type"},
             {title: "Message", field: "message"},
         ],
-        height: "1000px",
+        height: "2000px",
     });
 
     const data: any = [];
@@ -75,25 +74,4 @@ function tabulatorLogs(logLines: LogLine[]) {
 
     // tslint:disable-next-line: no-console
     console.log(table);
-}
-
-function clusterizeLogs(logLines: LogLine[]) {
-    try {
-        const data: string[] = [];
-        logLines.forEach((logLine) => {
-            data.push(logLine.clusterize());
-        });
-
-        const clusterize = new Clusterize({
-            contentId: "contentArea",
-            rows: data,
-            scrollId: "scrollArea",
-        });
-
-        // tslint:disable-next-line: no-console
-        console.warn(`Row count: ${clusterize.getRowsAmount()}`);
-    } catch (error) {
-        // tslint:disable-next-line: no-console
-        console.error(error);
-    }
 }
