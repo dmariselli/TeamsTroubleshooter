@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, shell, dialog } from "electron";
+import { app, BrowserWindow, Menu, shell, MenuItem, dialog } from "electron";
 import * as path from "path";
 import * as MacMenu from "./lib/macMenus"
 
@@ -73,15 +73,10 @@ let template = [{
     label: 'Open',
     accelerator: 'CmdOrCtrl+O',
     click: (item: any, focusedWindow: any) => {
-      dialog.showOpenDialog({
-        properties: ['openFile']
-      }, (files) => {
-        console.error(files);
-          if (files !== undefined) {
-            console.error(files);
-          }
-        });
-      }
+      const file = dialog.showOpenDialog({ properties: ['openFile'] }, (filePaths) => {
+        mainWindow.webContents.send('fileObject', filePaths);
+      });
+    }
     }]
   },
 {
@@ -142,6 +137,7 @@ function createWindow() {
     mainWindow = null;
   });
 }
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
