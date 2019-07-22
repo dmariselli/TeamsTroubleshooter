@@ -2,18 +2,68 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>Teams Troubleshooter</title>
   </head>
   <body>
-    <h1>Hello World!</h1>
-    <!-- All of the Node.js APIs are available in this renderer process. -->
-    We are using Node.js <script>document.write(process.versions.node)</script>,
-    Chromium <script>document.write(process.versions.chrome)</script>,
-    and Electron <script>document.write(process.versions.electron)</script>
+    <div class="clusterize">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>PID</th>
+            <th>Type</th>
+            <th>Message</th>
+          </tr>
+        </thead>
+      </table>
+      <div id="scrollArea" class="clusterize-scroll">
+        <table class="table">
+          <tbody id="contentArea" class="clusterize-content">
+            <tr class="clusterize-no-data">
+              <td colspan="100">Loading data…</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <link href="node_modules/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+    <link href="node_modules/clusterize.js/clusterize.css" rel="stylesheet">
+    <div id="logs-table"></div>
   </body>
+
+  <style>
+    .clusterize-scroll {
+      max-height: 1100px;
+      overflow: unset;
+    }
+
+    th {
+      text-align: left;
+    }
+
+    /* Set appropriate styles for table */
+    .table {
+      table-layout: fixed;
+      width: 550px;
+    }
+
+    /* It's important to set equal width for both thead's (visual and helper) */
+    .clusterize thead td:nth-child(1) { width: 75px; }
+    .clusterize thead td:nth-child(2) { width: 125px; }
+    .clusterize thead td:nth-child(3) { width: 150px; }
+    .clusterize thead td:nth-child(4) { width: 200px; }
+
+    /* Helper thead must be hidden but "display: none" can not be applied
+    * so that simply remove unnecessary styles, if any (it resets Zurb foundation styles)
+    */
+    .clusterize-scroll thead td { padding: 0; }
+    .table { margin-bottom: 0; }
+  </style>
 
   <script>
     // You can also require other files to run in this process
     require('./dist/renderer.js')
   </script>
+  <script type="text/javascript" src="node_modules/tabulator-tables/dist/js/tabulator.min.js"></script>
 </html>
