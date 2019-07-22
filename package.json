@@ -1,5 +1,5 @@
 {
-  "name": "teams-mechanic",
+  "name": "teams-troubleshooter",
   "version": "0.0.1",
   "description": "A companion app to the Teams desktop app.",
   "scripts": {
@@ -9,10 +9,14 @@
     "start": "npm run build && electron ./dist/main.js"
   },
   "devDependencies": {
+    "@types/clusterize.js": "^0.17.1",
     "@types/event-stream": "^3.3.34",
     "@types/node": "^12.6.8",
+    "@types/tabulator-tables": "^4.2.4",
+    "clusterize.js": "^0.18.1",
     "electron": "^2.0.2",
     "event-stream": "^4.0.1",
+    "tabulator-tables": "^4.3.0",
     "tslint": "^5.10.0",
     "typescript": "^2.8.3"
   }

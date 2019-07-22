@@ -1,5 +1,7 @@
+import * as Clusterize from "clusterize.js";
 import * as eventStream from "event-stream";
 import * as fs from "fs";
+import { LogLine } from "./logLine";
 
 export function start() {
 
@@ -9,52 +11,8 @@ export function start() {
     const logLines: LogLine[] = [];
     const errors: string[] = [];
 
-    class LogLine {
-        private logDate: string;
-        private logPid: string;
-        private logType: string;
-        private logMessage: string;
-        private logLineNumber: number;
-
-        constructor(date: string, pid: string, type: string, message: string, lineNumber: number) {
-            this.logDate = date;
-            this.logPid = pid;
-            this.logType = type;
-            this.logMessage = message;
-            this.logLineNumber = lineNumber;
-        }
-
-        public get date(): string {
-            return this.logDate;
-        }
-
-        public get pid(): string {
-            return this.logPid;
-        }
-
-        public get type(): string {
-            return this.logType;
-        }
-
-        public get message(): string {
-            return this.logMessage;
-        }
-
-        public appendToMessage(value: string): void {
-            this.logMessage += value;
-        }
-
-        public get lineNumber(): number {
-            return this.logLineNumber;
-        }
-
-        public toString(): string {
-            return this.logLineNumber + this.logDate + this.logPid + this.logType + this.logMessage;
-        }
-    }
-
     // tslint:disable-next-line: no-console
-    console.time("reading");
+    console.time("Log Parsing");
 
     fs.createReadStream("/Downloads/logs.txt")
         .pipe(eventStream.split())
@@ -72,7 +30,7 @@ export function start() {
                     );
                     logLines.push(logLine);
                 } catch (error) {
-                    logLines.length > 0 ? logLines[logLines.length - 1] += line : errors.push(line);
+                    logLines.length > 0 ? logLines[logLines.length - 1].appendToMessage(line) : errors.push(line);
                 }
             })
             .on("error", (err) => {
@@ -81,11 +39,61 @@ export function start() {
             })
             .on("end", () => {
                 // tslint:disable-next-line: no-console
-                console.timeEnd("reading");
+                console.timeEnd("Log Parsing");
                 // tslint:disable-next-line: no-console
                 console.log(lineCount);
                 // tslint:disable-next-line: no-console
                 console.log(logLines);
+                if (errors.length > 0) {
+                    // tslint:disable-next-line: no-console
+                    console.error(errors);
+                }
+                tabulatorLogs(logLines);
+                // clusterizeLogs(logLines);
             }),
         );
+}
+
+function tabulatorLogs(logLines: LogLine[]) {
+    const Tabulator = require("tabulator-tables");
+    const table = new Tabulator("#logs-table", {
+        columns: [
+            {title: "Date", field: "date"},
+            {title: "PID", field: "pid"},
+            {title: "Type", field: "type"},
+            {title: "Message", field: "message"},
+        ],
+        height: "1000px",
+    });
+
+    const data: any = [];
+    logLines.forEach((logLine) => {
+        data.push(logLine.tabulatorize());
+    });
+
+    table.setData(data);
+
+    // tslint:disable-next-line: no-console
+    console.log(table);
+}
+
+function clusterizeLogs(logLines: LogLine[]) {
+    try {
+        const data: string[] = [];
+        logLines.forEach((logLine) => {
+            data.push(logLine.clusterize());
+        });
+
+        const clusterize = new Clusterize({
+            contentId: "contentArea",
+            rows: data,
+            scrollId: "scrollArea",
+        });
+
+        // tslint:disable-next-line: no-console
+        console.warn(`Row count: ${clusterize.getRowsAmount()}`);
+    } catch (error) {
+        // tslint:disable-next-line: no-console
+        console.error(error);
+    }
 }
