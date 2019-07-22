@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu, MenuItem, dialog } from "electron";
 import * as path from "path";
 
 let mainWindow: Electron.BrowserWindow;
@@ -23,7 +23,17 @@ function createWindow() {
     // when you should delete the corresponding element.
     mainWindow = null;
   });
+  const menu = new Menu()
+  menu.append(new MenuItem({ label: 'Select File', click() { 
+
+      const file = dialog.showOpenDialog({ properties: ['openFile'] }, (filePaths) => {
+        mainWindow.webContents.send('fileObject', filePaths);
+      });
+    } 
+  }))
+  Menu.setApplicationMenu(menu);
 }
+
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
