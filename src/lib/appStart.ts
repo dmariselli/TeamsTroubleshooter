@@ -18,6 +18,7 @@ export function start(file: string) {
     console.time("Log Parsing");
     let currentPid:string = undefined;
     let currentClientVersion: string = undefined;
+    let currentSsoEventData: string[] = [];
     let count:string[];
     fs.createReadStream(file)
         .pipe(eventStream.split())
@@ -35,13 +36,20 @@ export function start(file: string) {
                     );
                     if(!currentPid) { currentPid = result[2];}
                     else if(currentPid != result[2]) {
-                        map.set(currentPid, new Process(currentPid,logLines, currentClientVersion));
+                        let process: Process = new Process(currentPid,logLines, currentClientVersion);
+                        process.ssoEventData = currentSsoEventData;
+                        map.set(currentPid, process);
                         logLines = [];
                         currentPid = result[2];
                         currentClientVersion = undefined;
+                        currentSsoEventData = [];
                     } else if(!currentClientVersion) {
                         let index = result[4].indexOf("Client version is:");
                         if(index > -1) currentClientVersion = result[4].substring(index+19);
+                    }
+
+                    if(result[3] === 'event' && result[4].indexOf('ssoEventData') > -1){
+                        currentSsoEventData.push(result[4]);
                     }
                     logLines.push(logLine);
                     allLogs.push(logLine);
@@ -57,7 +65,9 @@ export function start(file: string) {
                 // tslint:disable-next-line: no-console
                 console.timeEnd("Log Parsing");
                 // tslint:disable-next-line: no-console
-                map.set(currentPid, new Process(currentPid,logLines,currentClientVersion));
+                let process: Process = new Process(currentPid,logLines, currentClientVersion);
+                process.ssoEventData = currentSsoEventData;
+                map.set(currentPid, process);
                 console.log(map);
                 console.log(count);
                 // tslint:disable-next-line: no-console
