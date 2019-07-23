@@ -1,7 +1,8 @@
 import * as eventStream from "event-stream";
 import * as fs from "fs";
 import { LogLine } from "./logLine";
-import { Processes } from "./processes"
+import { Processes } from "./processes";
+import * as Parser from "./parser";
 
 export function start(file: string) {
 
@@ -14,7 +15,6 @@ export function start(file: string) {
 
     // tslint:disable-next-line: no-console
     console.time("Log Parsing");
-    let currentClientVersion: string = undefined;
     let count:string[];
     fs.createReadStream(file)
         .pipe(eventStream.split())
@@ -31,10 +31,7 @@ export function start(file: string) {
                         lineCount,
                     );
 
-                    let process = processes.getOrCreateProcess(result[2]);
-                    if(result[4].includes('ssoEventData')) { process.addSsoEventData(result[4]); }
-                    process.logLines.push(logLine);
-                    process.addWebClientVersion(currentClientVersion);
+                    processes.getOrCreateFullProcess(logLine);
                     allLogs.push(logLine);
                 } catch (error) {
                     allLogs.length > 0 ? allLogs[allLogs.length - 1].appendToMessage(line) : errors.push(line);
@@ -47,8 +44,14 @@ export function start(file: string) {
             .on("end", () => {
                 // tslint:disable-next-line: no-console
                 console.timeEnd("Log Parsing");
+                let processList = processes.getAllProcesses();
                 // tslint:disable-next-line: no-console
-                console.log(processes.getAllProcesses());
+                console.log(processList);
+                processList.forEach((process) => {
+                    if (process.analysis.length > 0) {
+                        console.log(process.analysis[0].getExplanation());
+                    }
+                });
                 console.log(count);
                 // tslint:disable-next-line: no-console
                 console.log(allLogs);

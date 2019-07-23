@@ -1,20 +1,22 @@
 import { LogLine } from "./logLine";
+import { Analysis } from "./parser";
 
 export class Process {
     public pid: string;
-    public pClientVersions: string[] = [];
     public logLines: LogLine[] = [];
     public adalVersion: string;
     public ssoEventDataMap: Map<string,string>[] = [];
-    private map = new Map();
+    public analysis: Analysis[] = [];
+    private pClientVersions: string[] = [];
+    private webClientMap = new Map();
 
     constructor(pid: string) {
         this.pid = pid;
     }
 
     public addWebClientVersion(value: string): boolean {
-        if (!this.map.has(value)){
-            this.map.set(value, true);
+        if (!this.webClientMap.has(value)){
+            this.webClientMap.set(value, true);
             this.pClientVersions.push(value);
             return true;
         }
@@ -24,22 +26,5 @@ export class Process {
 
     public getAllWebClientVersions(): string[] {
         return this.pClientVersions;
-    }
-
-    public addSsoEventData(eventData: string): void{
-
-        let map:Map<string,string> = new Map<string,string>();
-        let statusIndex = eventData.indexOf('::');
-        map.set('status',eventData.substring(14,statusIndex));
-        eventData = eventData.substring(statusIndex+1);
-
-        let marks = eventData.split(';');
-        marks.forEach((mark) => {
-            let markSplit = mark.split(':');
-            map.set(markSplit[0],markSplit[1]);
-        });
-
-        this.ssoEventDataMap.push(map);
-
     }
 }
