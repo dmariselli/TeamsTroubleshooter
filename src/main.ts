@@ -1,6 +1,5 @@
 import { app, BrowserWindow, Menu, shell, MenuItem, dialog } from "electron";
 import * as path from "path";
-import * as MacMenu from "./lib/macMenus"
 
 let mainWindow: Electron.BrowserWindow;
 
