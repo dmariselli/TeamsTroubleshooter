@@ -1,22 +1,19 @@
-import * as Clusterize from "clusterize.js";
 import * as eventStream from "event-stream";
 import * as fs from "fs";
 import { LogLine } from "./logLine";
-import { Process } from "./process";
+import { Processes } from "./processes"
 
 export function start(file: string) {
 
     // tslint:disable-next-line: max-line-length
     const regex = /^(\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT[+-]\d{4}) \([A-Za-z .]+\) <(\d+)> -- (\w+) -- (.+)/;
     let lineCount = 0;
-    let logLines: LogLine[] = [];
     const allLogs: LogLine[] = [];
     const errors: string[] = [];
-    let map:Map<string, Process> = new Map<string, Process>();
+    let processes: Processes = new Processes();
 
     // tslint:disable-next-line: no-console
     console.time("Log Parsing");
-    let currentPid:string = undefined;
     let currentClientVersion: string = undefined;
     let count:string[];
     fs.createReadStream(file)
@@ -33,20 +30,13 @@ export function start(file: string) {
                         result[4],
                         lineCount,
                     );
-                    if(!currentPid) { currentPid = result[2];}
-                    else if(currentPid != result[2]) {
-                        map.set(currentPid, new Process(currentPid,logLines, currentClientVersion));
-                        logLines = [];
-                        currentPid = result[2];
-                        currentClientVersion = undefined;
-                    } else if(!currentClientVersion) {
-                        let index = result[4].indexOf("Client version is:");
-                        if(index > -1) currentClientVersion = result[4].substring(index+19);
-                    }
-                    logLines.push(logLine);
+
+                    let process = processes.getOrCreateProcess(result[2]);
+                    process.logLines.push(logLine);
+                    process.addWebClientVersion(currentClientVersion);
                     allLogs.push(logLine);
                 } catch (error) {
-                    logLines.length > 0 ? logLines[logLines.length - 1].appendToMessage(line) : errors.push(line);
+                    allLogs.length > 0 ? allLogs[allLogs.length - 1].appendToMessage(line) : errors.push(line);
                 }
             })
             .on("error", (err) => {
@@ -57,8 +47,7 @@ export function start(file: string) {
                 // tslint:disable-next-line: no-console
                 console.timeEnd("Log Parsing");
                 // tslint:disable-next-line: no-console
-                map.set(currentPid, new Process(currentPid,logLines,currentClientVersion));
-                console.log(map);
+                console.log(processes.getAllProcesses());
                 console.log(count);
                 // tslint:disable-next-line: no-console
                 console.log(allLogs);

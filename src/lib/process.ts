@@ -1,36 +1,27 @@
 import { LogLine } from "./logLine";
 
 export class Process {
-    private pPID: string;
-    private pClientVersion: string;
-    private pLogLines: LogLine[];
-    private pAdalVersion: string;
-    private pFirstLaunch: string;
+    public pid: string;
+    public pClientVersions: string[] = [];
+    public logLines: LogLine[] = [];
+    public adalVersion: string;
+    private map = new Map();
 
-    constructor(pid: string, logLines: LogLine[], clientVersion: string) {
-        this.pPID = pid;
-        this.pLogLines = logLines;
-        this.pClientVersion = clientVersion;
+    constructor(pid: string) {
+        this.pid = pid;
     }
 
-    public get pid(): string {
-        return this.pPID;
+    public addWebClientVersion(value: string): boolean {
+        if (!this.map.has(value)){
+            this.map.set(value, true);    // set any value to Map
+            this.pClientVersions.push(value);
+            return true;
+        }
+
+        return false;
     }
 
-    public get clientVersion(): string {
-        return this.pClientVersion;
+    public getAllWebClientVersions(): string[] {
+        return this.pClientVersions;
     }
-
-    public get logLines(): LogLine[] {
-        return this.pLogLines;
-    }
-
-    public get adalVersion(): string {
-        return this.pAdalVersion;
-    }
-
-    public get firstLaunchTime(): string {
-        return this.pFirstLaunch;
-    }
-
 }
