@@ -2,7 +2,6 @@ import * as eventStream from "event-stream";
 import * as fs from "fs";
 import { LogLine } from "./logLine";
 import { Processes } from "./processes";
-import * as Parser from "./parser";
 
 export function start(file: string) {
 
