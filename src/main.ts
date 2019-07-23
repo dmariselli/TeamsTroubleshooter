@@ -72,8 +72,8 @@ let template = [{
   submenu: [{
     label: 'Open',
     accelerator: 'CmdOrCtrl+O',
-    click: (item: any, focusedWindow: any) => {
-      const file = dialog.showOpenDialog({ properties: ['openFile'] }, (filePaths) => {
+    click: () => {
+      dialog.showOpenDialog({ properties: ['openFile'] }, (filePaths) => {
         mainWindow.webContents.send('fileObject', filePaths);
       });
     }

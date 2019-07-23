@@ -13,7 +13,7 @@ export class Process {
 
     public addWebClientVersion(value: string): boolean {
         if (!this.map.has(value)){
-            this.map.set(value, true);    // set any value to Map
+            this.map.set(value, true);
             this.pClientVersions.push(value);
             return true;
         }
