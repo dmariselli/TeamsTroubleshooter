@@ -70,7 +70,6 @@ function tabulatorLogs(logLines: LogLine[]) {
             {title: "Type", field: "type"},
             {title: "Message", field: "message"},
         ],
-        height: "2000px",
         groupBy: "pid",
         groupStartOpen:true,
         autoResize:true
