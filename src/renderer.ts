@@ -1,4 +1,3 @@
-import { LogLine } from "./lib/logLine";
 import { ipcRenderer } from "electron";
 
 ipcRenderer.on('data', (_event: any, data: {}[]) => {
@@ -27,3 +26,13 @@ function showTable(logLines: {}[]) {
     table.setData(data);
     console.log(table);
 }
+
+document.ondragover = document.ondrop = (ev) => {
+    ev.preventDefault()
+  }
+  
+  document.body.ondrop = (ev) => {
+    ipcRenderer.send('fileLocation', ev.dataTransfer.files[0].path);
+    console.log(ev.dataTransfer.files[0].path)
+    ev.preventDefault()
+  }
