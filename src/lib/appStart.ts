@@ -32,6 +32,7 @@ export function start(file: string) {
                     );
 
                     let process = processes.getOrCreateProcess(result[2]);
+                    if(result[4].includes('ssoEventData')) { process.addSsoEventData(result[4]); }
                     process.logLines.push(logLine);
                     process.addWebClientVersion(currentClientVersion);
                     allLogs.push(logLine);
