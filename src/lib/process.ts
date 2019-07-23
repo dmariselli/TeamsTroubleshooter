@@ -1,5 +1,5 @@
 import { LogLine } from "./logLine";
-import { Analysis } from "./parser";
+import { Analysis } from "./analysis/analyzer";
 
 export class Process {
     public pid: string;
