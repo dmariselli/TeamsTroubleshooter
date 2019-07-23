@@ -9,10 +9,12 @@
     "start": "npm run build && electron ./dist/main.js"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.4.32",
     "@types/clusterize.js": "^0.17.1",
     "@types/event-stream": "^3.3.34",
     "@types/node": "^12.6.8",
     "@types/tabulator-tables": "^4.2.4",
+    "adm-zip": "^0.4.13",
     "clusterize.js": "^0.18.1",
     "electron": "^2.0.2",
     "event-stream": "^4.0.1",

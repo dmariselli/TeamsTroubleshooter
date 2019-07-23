@@ -46,8 +46,16 @@ export class LogLine {
         return `<tr><td>${this.logDate}</td> <td>${this.logPid}</td> <td>${this.logType}</td> <td>${this.logMessage}</td></tr>`;
     }
 
-    public tabulatorize() {
+    public tabulatorize(): TabularCompatibleData {
         // tslint:disable-next-line: max-line-length
         return { id: this.logLineNumber, date: this.logDate, pid: this.logPid, type: this.logType, message: this.logMessage };
     }
+}
+
+export interface TabularCompatibleData {
+    id: number;
+    date: string;
+    pid: string;
+    type: string;
+    message: string;
 }
