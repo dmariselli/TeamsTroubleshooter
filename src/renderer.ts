@@ -1,7 +1,29 @@
+import { LogLine } from "./lib/logLine";
+import { ipcRenderer } from "electron";
 
-var ipcRenderer = require('electron').ipcRenderer;
-ipcRenderer.on('fileObject', function (event: any, data: string[]) {
-    module.require("./lib/appStart").start(data[0]);
-    console.log(event);
+ipcRenderer.on('data', (_event: any, data: {}[]) => {
+    showTable(data);
 });
 
+function showTable(logLines: {}[]) {
+    const Tabulator = require("tabulator-tables");
+    const table = new Tabulator("#logs-table", {
+        columns: [
+            {title: "Date", field: "date"},
+            {title: "PID", field: "pid"},
+            {title: "Type", field: "type"},
+            {title: "Message", field: "message"},
+        ],
+        groupBy: "pid",
+        groupStartOpen:true,
+        autoResize:true
+    });
+
+    const data: any = [];
+    logLines.forEach((logLine: {}) => {
+        data.push(logLine);
+    });
+
+    table.setData(data);
+    console.log(table);
+}

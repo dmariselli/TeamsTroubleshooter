@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, shell, MenuItem, dialog } from "electron";
+import { app, BrowserWindow, Menu, shell, dialog } from "electron";
 import * as path from "path";
 
 let mainWindow: Electron.BrowserWindow;
@@ -8,7 +8,7 @@ let template = [{
   submenu: [{
     label: 'Reload',
     accelerator: 'CmdOrCtrl+R',
-    click: (item: any, focusedWindow: { id: number; reload: () => void; }) => {
+    click: (_item: any, focusedWindow: { id: number; reload: () => void; }) => {
       if (focusedWindow) {
         // on reload, start fresh and close any old
         // open secondary windows
@@ -30,7 +30,7 @@ let template = [{
         return 'F11'
       }
     })(),
-    click: (item: any, focusedWindow: { setFullScreen: (arg0: boolean) => void; isFullScreen: () => boolean; }) => {
+    click: (_item: any, focusedWindow: { setFullScreen: (arg0: boolean) => void; isFullScreen: () => boolean; }) => {
       if (focusedWindow) {
         focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
       }
@@ -44,7 +44,7 @@ let template = [{
         return 'Ctrl+Shift+I'
       }
     })(),
-    click: (item: any, focusedWindow: { toggleDevTools: () => void; }) => {
+    click: (_item: any, focusedWindow: { toggleDevTools: () => void; }) => {
       if (focusedWindow) {
         focusedWindow.toggleDevTools()
       }
@@ -53,15 +53,15 @@ let template = [{
     type: 'separator'
   }, {
     label: 'App Version',
-    click: function (item: any, focusedWindow: any) {
+    click: (_item: any, focusedWindow: any) => {
       if (focusedWindow) {
         const options = {
           type: 'info',
           title: 'App Version',
           buttons: ['Ok'],
-          message: 'App version 0.0.1'
+          message: 'App version 0.0.2'
         }
-        dialog.showMessageBox(focusedWindow, options, function () {})
+        dialog.showMessageBox(focusedWindow, options, () => {})
       }
     }
   }]
@@ -73,7 +73,7 @@ let template = [{
     accelerator: 'CmdOrCtrl+O',
     click: () => {
       dialog.showOpenDialog({ properties: ['openFile'] }, (filePaths) => {
-        mainWindow.webContents.send('fileObject', filePaths);
+        require('./lib/appStart').start(filePaths[0]);
       });
     }
     }]
@@ -121,6 +121,8 @@ function createWindow() {
     height: 1200,
     width: 1800,
   });
+
+  (mainWindow as any).name = "mainWindow";
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, "../index.html"));

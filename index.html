@@ -8,6 +8,7 @@
     <div id ="charting-area" style=" background-color:lightblue; top:10px; position:fixed; width:99%; border-style: solid; height:45%">this place is for charts</div>
     <link href="node_modules/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
     <div id="logs-table" style="height:50%; position:fixed; width:99%; bottom:10px; border-style: solid"></div>
+    <a href="#" id="drag">item</a>
   </body>
 
     <script>
@@ -15,4 +16,10 @@
       require('./dist/renderer.js')
     </script>
     <script type="text/javascript" src="node_modules/tabulator-tables/dist/js/tabulator.min.js"></script>
+    <script type="text/javascript" charset="utf-8">
+      document.getElementById('drag').ondragstart = (event) => {
+        event.preventDefault()
+        ipcRenderer.send('ondragstart', '/path/to/item')
+      }
+    </script>
 </html>

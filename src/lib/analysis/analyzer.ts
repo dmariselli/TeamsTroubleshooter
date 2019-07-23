@@ -1,7 +1,6 @@
 import { ssoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
 
 export class analyzer {
-    private failureLogCount: number = 0;
     private ssoEventDataAnalyzer: ssoEventDataAnalyzer;
 
     constructor() {
