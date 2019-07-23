@@ -16,10 +16,5 @@
       require('./dist/renderer.js')
     </script>
     <script type="text/javascript" src="node_modules/tabulator-tables/dist/js/tabulator.min.js"></script>
-    <script type="text/javascript" charset="utf-8">
-      document.getElementById('drag').ondragstart = (event) => {
-        event.preventDefault()
-        ipcRenderer.send('ondragstart', '/path/to/item')
-      }
     </script>
 </html>

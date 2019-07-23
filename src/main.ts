@@ -1,5 +1,6 @@
 import { app, BrowserWindow, Menu, shell, dialog } from "electron";
 import * as path from "path";
+import * as AppStart from "./lib/appStart";
 
 let mainWindow: Electron.BrowserWindow;
 
@@ -73,7 +74,7 @@ let template = [{
     accelerator: 'CmdOrCtrl+O',
     click: () => {
       dialog.showOpenDialog({ properties: ['openFile'] }, (filePaths) => {
-        require('./lib/appStart').start(filePaths[0]);
+        AppStart.getInstance().start(filePaths[0]);
       });
     }
     }]
@@ -113,6 +114,7 @@ let template = [{
 
 
 function createWindow() {
+  AppStart.getInstance();
   const menu = Menu.buildFromTemplate(template);
   Menu.setApplicationMenu(menu);
 
