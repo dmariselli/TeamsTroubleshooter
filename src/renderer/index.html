@@ -12,8 +12,44 @@
   </body>
 
     <script>
-      // You can also require other files to run in this process
-      require('./index.js')
+      let ipcRenderer = require("electron").ipcRenderer;
+      ipcRenderer.on("data", (event, data) => {
+          showTable(data);
+      });
+
+      ipcRenderer.on("debugData", (event, data) => {
+        // tslint:disable-next-line: no-console
+        console.log(JSON.stringify(data));
+      });
+
+      function showTable(logLines) {
+        const Tabulator = require("tabulator-tables");
+        const table = new Tabulator("#logs-table", {
+            autoResize: true,
+            columns: [
+                {title: "Date", field: "date"},
+                {title: "PID", field: "pid"},
+                {title: "Type", field: "type"},
+                {title: "Message", field: "message"},
+            ],
+            groupBy: "pid",
+            groupStartOpen: true,
+        });
+
+        table.setData(logLines);
+      }
+
+      document.ondragover = document.ondrop = (ev) => {
+          ev.preventDefault();
+      };
+
+      document.body.ondrop = (ev) => {
+          if (ev && ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0]) {
+            ipcRenderer.send("fileLocation", ev.dataTransfer.files[0].path);
+          }
+          ev.preventDefault();
+      };
+
     </script>
     <script type="text/javascript" src="./../../node_modules/tabulator-tables/dist/js/tabulator.min.js"></script>
     </script>
