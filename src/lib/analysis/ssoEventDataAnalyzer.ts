@@ -63,7 +63,7 @@ export class SsoEventDataAnalyzer {
             case "should_wia":
                 return `WIA will ${result === "false" ? "not" : ""} be attempted as part of this auth flow.`;
             case "wia_status":
-                return `WIA call returned status code ${result}.`;
+                return `WIA call returned status code ${this.parseErrorCode(result)}.`;
             case "wiaSkipDiffUser":
                 if (result === "true") {
                     return "WIA was not attempted because the loginHint from the UPN does not match the domain joined user's UPN.";
@@ -80,16 +80,26 @@ export class SsoEventDataAnalyzer {
                 return "";
             case "use_wia":
                 if (result === "s") {
-                    return "WIA was attempted.";
+                    return "Modern WIA was attempted.";
                 } else if (result === "f") {
                     return "WIA request failed to be made.";
                 }
 
-                return "WIA was attempted.";
+                return "No skip WIA hook was found. Proceeding with WIA attempt.";
+            case "use_wa":
+                if (result === "success") {
+                    return "WIA was attempted.";
+                }
+
+                return "WIA request failed to be made.";
+            case "wa_logoutskip":
+                return "WIA attempt skipped since the user was logged out.";
+            case "error_wia":
+                return "WIA request failed to be made.";
             case "ats":
-                return `Acquire token call resulted in status code '${results[0]}' and error code '${results[1]}'.`;
+                return `Acquire token call resulted in status code '${this.parseErrorCode(results[0])}' and error code '${this.parseErrorCode(results[1])}'.`;
             case "at":
-                return `The acquire token call failed and requested for user input.` +
+                return `The acquire token call failed and requested for user input. ` +
                         `As a result, a prompt may be shown unless there is already one running.`;
             case "fre-upn-win":
                 return `${result === "fre-upn-win-success" ? "Succeeded" : "Failed"} in fetching the UPN from the UPN window.`;
@@ -107,12 +117,19 @@ export class SsoEventDataAnalyzer {
                 return "Failed to remove auth cookies.";
             case "removeCookieFlag":
                 return "Attempting to remove the previous auth cookies (if any).";
+            case "ubc":
+                return "UPN was fetched before creating context by checking for homeUserUpn key in storage.json and if that failed, attempting to grab the Windows user UPN.";
             case "enc":
                 return `${result === "t" ? "Succeeded" : "Failed"} in encoding the user object.`;
             case "addToMapV2":
                 return `${result === "t" ? "Succeeded" : "Failed"} in adding/updating the user object to the async user map.`;
             case "detectSemicolon":
                 return `${result === "s" ? "Found a" : "Did not find a"} semicolon in the user profile.`;
+            case "addToMap":
+                return `${result === "s" ? "Succeeded" : "Failed"} in adding the cached user to the user map for use by Offline/LBW flows. ` +
+                        `This is old code that can cause issues for customers with special characters in their names.`;
+            case "remav":
+                return `ADAL 2 is disabled. ${result === "s" ? "Succeeded" : "Failed" } in trying to remove the adal version from the regkey (used by Outlook Add-in).`;
             case "sso_default_fail":
                 if (results.length === 2) {
                     return `SSO failed with error code '${results[0]}' and status code '${results[1]}'.`;
@@ -125,7 +142,7 @@ export class SsoEventDataAnalyzer {
                     return "Successfully set the cached user profile cookie.";
                 }
 
-                return "Failed to set the cached user profile cookie." +
+                return "Failed to set the cached user profile cookie. " +
                         "This is acceptable so long as the processEnv contains the cached user profile.";
             case "setCacheProfile":
                 if (result === "t") {
@@ -141,7 +158,7 @@ export class SsoEventDataAnalyzer {
                     return `Set the ${actionString.substring(3)} cookie successfully.`;
                 }
 
-                return `Failed to set the ${actionString.substring(3)} cookie.` +
+                return `Failed to set the ${actionString.substring(3)} cookie. ` +
                         `(Old code might return failure when it succeeds. Check following logs for real result.)`;
             case "frw=true":
             case "frw=false":
@@ -160,6 +177,8 @@ export class SsoEventDataAnalyzer {
                 return "SSO failed, setting the failure ssoStatus cookie.";
             case "failCookieSet":
                 return "Successfully set the failure ssoStatus cookie.";
+            case "err=Error":
+                return `The following error was thrown during the auth flow. '${result}'.`;
             case "lwp":
                 return "Code is executing the login window promise.";
             case "lwp-status":
@@ -211,7 +230,8 @@ export class SsoEventDataAnalyzer {
             case "caa10001":
                 return "CAA10001: Need user interface to continue";
             case "caa2000c":
-                return "CAA2000C: The request requires user interaction";
+            case "200":
+                return `${errorCode.toUpperCase()}: The request requires user interaction`;
             case "caa20064":
                 return "CAA20064: Server returned an unknown error code";
             case "caa20003":
@@ -220,6 +240,10 @@ export class SsoEventDataAnalyzer {
                 return "4c7: The user cancelled the prompt";
             case "caa20001":
                 return "CAA20001: The client is not authorized to request an authorization code using this method";
+            case "0":
+                return "0: Success";
+            case "403":
+                return "403: Forbidden";
             default:
                 return errorCode;
         }
