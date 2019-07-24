@@ -1,12 +1,17 @@
 import { ipcRenderer } from "electron";
-
-ipcRenderer.on('data', (_event: any, data: {}[]) => {
+ipcRenderer.on("data", (event: any, data: Array<{}>) => {
     showTable(data);
 });
 
-function showTable(logLines: {}[]) {
+ipcRenderer.on("debugData", (event: any, data: string[]) => {
+    // tslint:disable-next-line: no-console
+    console.log(JSON.stringify(data));
+});
+
+function showTable(logLines: Array<{}>) {
     const Tabulator = require("tabulator-tables");
     const table = new Tabulator("#logs-table", {
+        autoResize: true,
         columns: [
             {title: "Date", field: "date"},
             {title: "PID", field: "pid"},
@@ -14,25 +19,17 @@ function showTable(logLines: {}[]) {
             {title: "Message", field: "message"},
         ],
         groupBy: "pid",
-        groupStartOpen:true,
-        autoResize:true
+        groupStartOpen: true,
     });
 
-    const data: any = [];
-    logLines.forEach((logLine: {}) => {
-        data.push(logLine);
-    });
-
-    table.setData(data);
-    console.log(table);
+    table.setData(logLines);
 }
 
 document.ondragover = document.ondrop = (ev) => {
-    ev.preventDefault()
-  }
-  
-  document.body.ondrop = (ev) => {
-    ipcRenderer.send('fileLocation', ev.dataTransfer.files[0].path);
-    console.log(ev.dataTransfer.files[0].path)
-    ev.preventDefault()
-  }
+    ev.preventDefault();
+};
+
+document.body.ondrop = (ev) => {
+    ipcRenderer.send("fileLocation", ev.dataTransfer.files[0].path);
+    ev.preventDefault();
+};

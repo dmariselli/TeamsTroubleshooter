@@ -4,21 +4,55 @@
     <meta charset="UTF-8">
     <title>Teams Troubleshooter</title>
     <link rel="stylesheet" href="src/contents/bootstrap/css/bootstrap.css" />
+    <link href="node_modules/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+    <script>window.$ = window.jQuery = require('jquery');</script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
  
-    <!-- Bootstrap Optional JavaScript -->
-    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script>let $ = require('jquery');</script>
     <script>require('popper.js');</script>
     <script>require('bootstrap');</script>
   </head>
   <body>
-    <div id ="charting-area" style=" background-color:lightblue; top:10px; position:fixed; width:99%; border-style: solid; height:45%">this place is for charts</div>
-    <link href="node_modules/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
-    <div id="logs-table" style="height:50%; position:fixed; width:99%; bottom:10px; border-style: solid"></div>
+
+      <div id="bigboypants">
+          <div id="navbar">
+              <ul class="nav nav-pills" data-toggle="tab">
+                  <li class="active"><a data-toggle="pill" href="#home" data-toggle="tab">Home</a></li>
+                  <li><a data-toggle="pill" href="#menu1" data-toggle="tab">Analysis Tab</a></li>
+                  <li><a data-toggle="pill" href="#menu2" data-toggle="tab">Logs Table</a></li>
+                </ul>
+          </div>
+          <div class="tab-content">
+              <div id="home" class="tab-pane fade in active">
+                <h3>HOME</h3>
+                
+              </div>
+              <div id="menu1" class="tab-pane fade">
+                <h3>Analysis</h3>
+                <p>
+                    <div id="analysisrow">
+                        <div id="analysisblock"></div>
+                        <div id="analysisblock2"></div>
+                        <div id="analysisblock3"></div>
+                    </div>
+                    <div id="charting-area">
+                      
+                    </div>
+                </p>
+              </div>
+              <div id="menu2" class="tab-pane fade">
+                <h3>Logs Table</h3>
+                  <div id="logs-table" style=" height:70%; position:fixed; width:96%; bottom:10px; border-style: solid; right:2%; left:2%"></div>
+              </div>
+            </div>
+      </div>
     <a href="#" id="drag">item</a>
   </body>
 
     <script>
+      $('#tabs a').on('click', function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+      })
       // You can also require other files to run in this process
       require('./dist/renderer.js')
     </script>
