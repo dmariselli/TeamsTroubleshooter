@@ -1,22 +1,13 @@
 {
   "extends": "tslint:recommended",
+  "defaultSeverity": "error",
   "rules": {
-    "max-line-length": {
-      "options": [
-        140
-      ]
+    "indent": [true, "spaces"],
+    "ter-indent": [true, 2],
+    "space-before-function-paren": [true, {"anonymous": "always", "named": "never", "asyncArrow": "always"}],
+    "quotemark": {
+        "options": ["single", "avoid-escape"]
     },
-    "new-parens": true,
-    "no-arg": true,
-    "no-bitwise": true,
-    "no-conditional-assignment": true,
-    "no-consecutive-blank-lines": false
-  },
-  "jsRules": {
-    "max-line-length": {
-      "options": [
-        140
-      ]
-    }
+    "semicolon": [true, "always"]
   }
 }

@@ -1,25 +1,36 @@
 {
-  "name": "teams-troubleshooter",
-  "version": "0.0.1",
-  "description": "A companion app to the Teams desktop app.",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc -w",
-    "lint": "tslint -c tslint.json -p tsconfig.json",
-    "start": "npm run build && electron ./dist/main.js"
-  },
-  "devDependencies": {
-    "@types/adm-zip": "^0.4.32",
-    "@types/clusterize.js": "^0.17.1",
-    "@types/event-stream": "^3.3.34",
-    "@types/node": "^12.6.8",
-    "@types/tabulator-tables": "^4.2.4",
-    "adm-zip": "^0.4.13",
-    "clusterize.js": "^0.18.1",
-    "electron": "^2.0.2",
-    "event-stream": "^4.0.1",
-    "tabulator-tables": "^4.3.0",
-    "tslint": "^5.10.0",
-    "typescript": "^2.8.3"
-  }
+    "name": "teams-troubleshooter",
+    "version": "0.1.0",
+    "description": "A companion app to the Teams desktop app.",
+    "scripts": {
+        "clean": "rimraf dist installer",
+        "compile": "electron-webpack",
+        "dev": "electron-webpack dev",
+        "dist": "yarn compile && electron-builder"
+    },
+    "dependencies": {
+        "source-map-support": "^0.5.3"
+    },
+    "devDependencies": {
+        "@types/adm-zip": "^0.4.32",
+        "@types/clusterize.js": "^0.17.1",
+        "@types/event-stream": "^3.3.34",
+        "@types/node": "^12.6.8",
+        "@types/tabulator-tables": "^4.2.4",
+        "adm-zip": "^0.4.13",
+        "event-stream": "^4.0.1",
+        "tabulator-tables": "^4.3.0",
+        "electron": "2.0.2",
+        "electron-builder": "^20.5.1",
+        "electron-webpack": "2.0.1",
+        "electron-webpack-ts": "^2.0.0",
+        "eslint-plugin-html": "^4.0.2",
+        "tslint": "^5.10.0",
+        "tslint-loader": "^3.6.0",
+        "typescript": "^2.8.3",
+        "webpack": "^4.5.0"
+    },
+    "resolutions": {
+        "webpack-sources": "1.1.0"
+    }
 }

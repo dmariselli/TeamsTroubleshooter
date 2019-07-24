@@ -31,6 +31,8 @@ document.ondragover = document.ondrop = (ev) => {
 };
 
 document.body.ondrop = (ev) => {
-    ipcRenderer.send("fileLocation", ev.dataTransfer.files[0].path);
+    if (ev && ev.dataTransfer && ev.dataTransfer.files && ev.dataTransfer.files[0]) {
+      ipcRenderer.send("fileLocation", ev.dataTransfer.files[0].path);
+    }
     ev.preventDefault();
 };
