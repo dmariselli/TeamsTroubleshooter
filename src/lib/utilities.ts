@@ -2,7 +2,7 @@ import { BrowserWindow } from "electron";
 
 export function getWindowByName(name: string): Electron.BrowserWindow {
     try {
-        for (let browserWindow of BrowserWindow.getAllWindows() as Electron.BrowserWindow[]) {
+        for (const browserWindow of BrowserWindow.getAllWindows() as Electron.BrowserWindow[]) {
             if ((browserWindow as any).name === name) {
                 return browserWindow;
             }

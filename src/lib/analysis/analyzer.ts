@@ -1,6 +1,6 @@
 import { ssoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
 
-export class analyzer {
+export class Analyzer {
     private ssoEventDataAnalyzer: ssoEventDataAnalyzer;
 
     constructor() {
@@ -8,7 +8,7 @@ export class analyzer {
     }
 
     public analyze(logMessage: string): Analysis {
-        let analyzableLog = this.getAnalyzableLogIfApplicable(logMessage);
+        const analyzableLog = this.getAnalyzableLogIfApplicable(logMessage);
         if (!analyzableLog) {
             return;
         }
@@ -25,7 +25,7 @@ export class analyzer {
         if (message.includes("ssoEventData")) {
             return new AnalyzableLog(AnalysisType.SsoEventData, message);
         }
-    
+
         return new AnalyzableLog(AnalysisType.NotApplicable);
     }
 }
