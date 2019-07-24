@@ -1,7 +1,20 @@
 import { ipcRenderer } from "electron";
-
+let logTableData:any;
+let isFirstTime: boolean = true;
 ipcRenderer.on("data", (event: any, data: Array<{}>) => {
+    logTableData = data;
     showTable(data);
+});
+
+document.getElementById("logtable").addEventListener('click',function(){
+    if(logTableData && isFirstTime) {
+        setTimeout(() => 
+            {
+                showTable(logTableData);
+                isFirstTime = false;
+            },
+            200);
+    }
 });
 
 ipcRenderer.on("debugData", (event: any, data: string[]) => {
