@@ -1,10 +1,10 @@
-import { ssoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
+import { SsoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
 
 export class Analyzer {
-    private ssoEventDataAnalyzer: ssoEventDataAnalyzer;
+    private ssoEventDataAnalyzer: SsoEventDataAnalyzer;
 
     constructor() {
-        this.ssoEventDataAnalyzer = new ssoEventDataAnalyzer();
+        this.ssoEventDataAnalyzer = new SsoEventDataAnalyzer();
     }
 
     public analyze(logMessage: string): Analysis {

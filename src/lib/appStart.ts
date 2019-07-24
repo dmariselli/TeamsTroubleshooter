@@ -1,7 +1,7 @@
 import { ipcMain } from "electron";
 import * as eventStream from "event-stream";
 import * as fs from "fs";
-import { LogLine, TabularCompatibleData } from "./logLine";
+import { ITabularCompatibleData, LogLine } from "./logLine";
 import { Processes } from "./processes";
 import * as Utilities from "./utilities";
 
@@ -68,7 +68,7 @@ class AppStart {
                     }
 
                     Utilities.getWindow().webContents.send("debugData", explanationList);
-                    const tabularData: TabularCompatibleData[] = [];
+                    const tabularData: ITabularCompatibleData[] = [];
                     allLogs.forEach((logLine: LogLine) => {
                         tabularData.push(logLine.tabulatorize());
                     });

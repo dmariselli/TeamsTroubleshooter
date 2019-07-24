@@ -1,10 +1,10 @@
-import * as Analyzer from "./analysis/analyzer";
+import { Analyzer} from "./analysis/analyzer";
 import { LogLine } from "./logLine";
 import { Process } from "./process";
 
 export class Processes {
     private processMap: Map<string, Process> = new Map<string, Process>();
-    private analyzer = new Analyzer.analyzer();
+    private analyzer = new Analyzer();
 
     public getOrCreateProcess(pid: string): Process {
         if (this.processMap.has(pid)) {
