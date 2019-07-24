@@ -3,6 +3,7 @@ let logTableData:any;
 let isFirstTime: boolean = true;
 ipcRenderer.on("data", (event: any, data: Array<{}>) => {
     logTableData = data;
+    isFirstTime = true;
     showTable(data);
 });
 
