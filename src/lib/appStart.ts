@@ -8,7 +8,6 @@ import { ipcMain } from "electron";
 class appStart {
     constructor() {
         ipcMain.on('fileLocation', (_event: any, data: string) => {
-            console.log("received data: " + data);
             this.start(data);
         })
     }
@@ -24,7 +23,6 @@ class appStart {
     
         // tslint:disable-next-line: no-console
         console.time("Log Parsing");
-        let count:string[];
         fs.createReadStream(file)
             .pipe(eventStream.split())
             .pipe(
@@ -52,7 +50,7 @@ class appStart {
                 })
                 .on("end", () => {
                     console.timeEnd("Log Parsing");
-                    console.log(count);
+                    console.log(`Total number of log lines processed: ${lineCount}.`);
     
                     let processList = processes.getAllProcesses();
                     let explanationList: string[] = [];
@@ -61,10 +59,12 @@ class appStart {
                             explanationList.push(process.analysis[0].getExplanation());
                         }
                     });
+
                     if (errors.length > 0) {
                         console.error(errors);
                     }
-    
+
+                    Utilities.getWindow().webContents.send('debugData', explanationList);
                     let tabularData: TabularCompatibleData[] = [];
                     allLogs.forEach((logLine: LogLine) => {
                         tabularData.push(logLine.tabulatorize());

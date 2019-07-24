@@ -4,6 +4,10 @@ ipcRenderer.on('data', (_event: any, data: {}[]) => {
     showTable(data);
 });
 
+ipcRenderer.on('debugData', (_event: any, data: string[]) => {
+    console.log(JSON.stringify(data));
+});
+
 function showTable(logLines: {}[]) {
     const Tabulator = require("tabulator-tables");
     const table = new Tabulator("#logs-table", {
@@ -18,21 +22,14 @@ function showTable(logLines: {}[]) {
         autoResize:true
     });
 
-    const data: any = [];
-    logLines.forEach((logLine: {}) => {
-        data.push(logLine);
-    });
-
-    table.setData(data);
-    console.log(table);
+    table.setData(logLines);
 }
 
 document.ondragover = document.ondrop = (ev) => {
-    ev.preventDefault()
-  }
+    ev.preventDefault();
+}
   
-  document.body.ondrop = (ev) => {
+document.body.ondrop = (ev) => {
     ipcRenderer.send('fileLocation', ev.dataTransfer.files[0].path);
-    console.log(ev.dataTransfer.files[0].path)
-    ev.preventDefault()
-  }
+    ev.preventDefault();
+}

@@ -74,7 +74,9 @@ let template = [{
     accelerator: 'CmdOrCtrl+O',
     click: () => {
       dialog.showOpenDialog({ properties: ['openFile'] }, (filePaths) => {
-        AppStart.getInstance().start(filePaths[0]);
+        if (filePaths && filePaths.length > 0) {
+          AppStart.getInstance().start(filePaths[0]);
+        }
       });
     }
     }]
