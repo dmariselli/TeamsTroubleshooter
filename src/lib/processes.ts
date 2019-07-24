@@ -1,17 +1,17 @@
-import { Process } from "./process";
-import * as Analyzer from "./analysis/analyzer";
+import { Analyzer} from "./analysis/analyzer";
 import { LogLine } from "./logLine";
+import { Process } from "./process";
 
 export class Processes {
     private processMap: Map<string, Process> = new Map<string, Process>();
-    private analyzer = new Analyzer.analyzer();
+    private analyzer = new Analyzer();
 
     public getOrCreateProcess(pid: string): Process {
         if (this.processMap.has(pid)) {
             return this.processMap.get(pid);
         }
 
-        let process = new Process(pid);
+        const process = new Process(pid);
         this.processMap.set(pid, process);
         return process;
     }
@@ -21,8 +21,8 @@ export class Processes {
     }
 
     public getOrCreateFullProcess(logLine: LogLine): Process {
-        let process = this.getOrCreateProcess(logLine.pid);
-        let analysis = this.analyzer.analyze(logLine.message);
+        const process = this.getOrCreateProcess(logLine.pid);
+        const analysis = this.analyzer.analyze(logLine.message);
         process.logLines.push(logLine);
         if (analysis) {
             process.analysis.push(analysis);

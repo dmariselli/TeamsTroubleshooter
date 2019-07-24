@@ -1,15 +1,15 @@
+import { ipcMain } from "electron";
 import * as eventStream from "event-stream";
 import * as fs from "fs";
-import { LogLine, TabularCompatibleData } from "./logLine";
+import { ITabularCompatibleData, LogLine } from "./logLine";
 import { Processes } from "./processes";
 import * as Utilities from "./utilities";
-import { ipcMain } from "electron";
 
-class appStart {
+class AppStart {
     constructor() {
-        ipcMain.on('fileLocation', (_event: any, data: string) => {
+        ipcMain.on("fileLocation", (event: any, data: string) => {
             this.start(data);
-        })
+        });
     }
 
     public start(file: string) {
@@ -19,8 +19,8 @@ class appStart {
         let lineCount = 0;
         const allLogs: LogLine[] = [];
         const errors: string[] = [];
-        let processes: Processes = new Processes();
-    
+        const processes: Processes = new Processes();
+
         // tslint:disable-next-line: no-console
         console.time("Log Parsing");
         fs.createReadStream(file)
@@ -37,7 +37,7 @@ class appStart {
                             result[4],
                             lineCount,
                         );
-    
+
                         processes.getOrCreateFullProcess(logLine);
                         allLogs.push(logLine);
                     } catch (error) {
@@ -49,11 +49,13 @@ class appStart {
                     console.error("Error while reading file.", err);
                 })
                 .on("end", () => {
+                    // tslint:disable-next-line: no-console
                     console.timeEnd("Log Parsing");
+                    // tslint:disable-next-line: no-console
                     console.log(`Total number of log lines processed: ${lineCount}.`);
-    
-                    let processList = processes.getAllProcesses();
-                    let explanationList: string[] = [];
+
+                    const processList = processes.getAllProcesses();
+                    const explanationList: string[] = [];
                     processList.forEach((process) => {
                         if (process.analysis.length > 0) {
                             explanationList.push(process.analysis[0].getExplanation());
@@ -61,26 +63,27 @@ class appStart {
                     });
 
                     if (errors.length > 0) {
+                        // tslint:disable-next-line: no-console
                         console.error(errors);
                     }
 
-                    Utilities.getWindow().webContents.send('debugData', explanationList);
-                    let tabularData: TabularCompatibleData[] = [];
+                    Utilities.getWindow().webContents.send("debugData", explanationList);
+                    const tabularData: ITabularCompatibleData[] = [];
                     allLogs.forEach((logLine: LogLine) => {
                         tabularData.push(logLine.tabulatorize());
                     });
-    
-                    Utilities.getWindow().webContents.send('data', tabularData);
+
+                    Utilities.getWindow().webContents.send("data", tabularData);
                 }),
             );
     }
 }
 
-let appStartInstance: appStart;
+let appStartInstance: AppStart;
 
 export function getInstance() {
     if (!appStartInstance) {
-        appStartInstance = new appStart();
+        appStartInstance = new AppStart();
     }
 
     return appStartInstance;

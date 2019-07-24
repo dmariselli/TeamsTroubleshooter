@@ -1,117 +1,119 @@
-import { app, BrowserWindow, Menu, shell, dialog } from "electron";
+import { app, BrowserWindow, dialog, Menu, shell } from "electron";
 import * as path from "path";
 import * as AppStart from "./lib/appStart";
 
 let mainWindow: Electron.BrowserWindow;
 
-let template = [{
-  label: 'View',
+const template = [{
+  label: "View",
   submenu: [{
-    label: 'Reload',
-    accelerator: 'CmdOrCtrl+R',
-    click: (_item: any, focusedWindow: { id: number; reload: () => void; }) => {
+    accelerator: "CmdOrCtrl+R",
+    click: (item: any, focusedWindow: { id: number; reload: () => void; }) => {
       if (focusedWindow) {
         // on reload, start fresh and close any old
         // open secondary windows
         if (focusedWindow.id === 1) {
-          BrowserWindow.getAllWindows().forEach(win => {
-            if (win.id > 1) win.close()
-          })
+          BrowserWindow.getAllWindows().forEach((win) => {
+            if (win.id > 1) {
+              win.close();
+            }
+          });
         }
-        focusedWindow.reload()
+        focusedWindow.reload();
       }
-    }
-  }, 
+    },
+    label: "Reload",
+  },
   {
-    label: 'Toggle Full Screen',
     accelerator: (() => {
-      if (process.platform === 'darwin') {
-        return 'Ctrl+Command+F'
+      if (process.platform === "darwin") {
+        return "Ctrl+Command+F";
       } else {
-        return 'F11'
+        return "F11";
       }
     })(),
-    click: (_item: any, focusedWindow: { setFullScreen: (arg0: boolean) => void; isFullScreen: () => boolean; }) => {
+    click: (item: any, focusedWindow: { setFullScreen: (arg0: boolean) => void; isFullScreen: () => boolean; }) => {
       if (focusedWindow) {
         focusedWindow.setFullScreen(!focusedWindow.isFullScreen())
       }
-    }
+    },
+    label: "Toggle Full Screen",
   }, {
-    label: 'Toggle Developer Tools',
     accelerator: (() => {
-      if (process.platform === 'darwin') {
-        return 'Alt+Command+I'
+      if (process.platform === "darwin") {
+        return "Alt+Command+I";
       } else {
-        return 'Ctrl+Shift+I'
+        return "Ctrl+Shift+I";
       }
     })(),
-    click: (_item: any, focusedWindow: { toggleDevTools: () => void; }) => {
+    click: (item: any, focusedWindow: { toggleDevTools: () => void; }) => {
       if (focusedWindow) {
-        focusedWindow.toggleDevTools()
+        focusedWindow.toggleDevTools();
       }
-    }
+    },
+    label: "Toggle Developer Tools",
   }, {
-    type: 'separator'
+    type: "separator",
   }, {
-    label: 'App Version',
-    click: (_item: any, focusedWindow: any) => {
+    click: (item: any, focusedWindow: any) => {
       if (focusedWindow) {
         const options = {
-          type: 'info',
-          title: 'App Version',
-          buttons: ['Ok'],
-          message: 'App version 0.0.2'
-        }
-        dialog.showMessageBox(focusedWindow, options, () => {})
+          buttons: ["Ok"],
+          message: "App version 0.0.2",
+          title: "App Version",
+          type: "info",
+        };
+        dialog.showMessageBox(focusedWindow, options);
       }
-    }
-  }]
+    },
+    label: "App Version",
+  }],
 },
 {
-  label: 'Manage Files',
+  label: "Manage Files",
   submenu: [{
-    label: 'Open',
-    accelerator: 'CmdOrCtrl+O',
+    accelerator: "CmdOrCtrl+O",
     click: () => {
-      dialog.showOpenDialog({ properties: ['openFile'] }, (filePaths) => {
+      dialog.showOpenDialog({ properties: ["openFile"] }, (filePaths) => {
         if (filePaths && filePaths.length > 0) {
           AppStart.getInstance().start(filePaths[0]);
         }
       });
-    }
-    }]
+    },
+    label: "Open",
+    }],
   },
 {
-  label: 'Window',
-  role: 'window',
+  label: "Window",
+  role: "window",
   submenu: [{
-    label: 'Minimize',
-    accelerator: 'CmdOrCtrl+M',
-    role: 'minimize'
+    accelerator: "CmdOrCtrl+M",
+    label: "Minimize",
+    role: "minimize",
   }, {
-    label: 'Close',
-    accelerator: 'CmdOrCtrl+W',
-    role: 'close'
+    accelerator: "CmdOrCtrl+W",
+    label: "Close",
+    role: "close",
   }, {
-    type: 'separator'
+    type: "separator",
   }, {
-    label: 'Reopen Window',
-    accelerator: 'CmdOrCtrl+Shift+T',
+    accelerator: "CmdOrCtrl+Shift+T",
+    click: () => {
+      app.emit("activate");
+    },
     enabled: false,
-    key: 'reopenMenuItem',
-    click: () => {
-      app.emit('activate')
-    }
-  }]
+    key: "reopenMenuItem",
+    label: "Reopen Window",
+  }],
 }, {
-  label: 'Help',
-  role: 'help',
+  label: "Help",
+  role: "help",
   submenu: [{
-    label: 'Open Teams',
     click: () => {
-      shell.openExternal('https://teams.microsoft.com');
-    }
-  }]
+      shell.openExternal("https://teams.microsoft.com");
+    },
+    label: "Open Teams",
+  }],
 }] as Electron.MenuItemConstructorOptions[];
 
 

@@ -1,11 +1,10 @@
-import { LogLine } from "./logLine";
 import { Analysis } from "./analysis/analyzer";
+import { LogLine } from "./logLine";
 
 export class Process {
     public pid: string;
     public logLines: LogLine[] = [];
     public adalVersion: string;
-    public ssoEventDataMap: Map<string,string>[] = [];
     public analysis: Analysis[] = [];
     private pClientVersions: string[] = [];
     private webClientMap = new Map();

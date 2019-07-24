@@ -1,14 +1,14 @@
-import { ssoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
+import { SsoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
 
-export class analyzer {
-    private ssoEventDataAnalyzer: ssoEventDataAnalyzer;
+export class Analyzer {
+    private ssoEventDataAnalyzer: SsoEventDataAnalyzer;
 
     constructor() {
-        this.ssoEventDataAnalyzer = new ssoEventDataAnalyzer();
+        this.ssoEventDataAnalyzer = new SsoEventDataAnalyzer();
     }
 
     public analyze(logMessage: string): Analysis {
-        let analyzableLog = this.getAnalyzableLogIfApplicable(logMessage);
+        const analyzableLog = this.getAnalyzableLogIfApplicable(logMessage);
         if (!analyzableLog) {
             return;
         }
@@ -25,7 +25,7 @@ export class analyzer {
         if (message.includes("ssoEventData")) {
             return new AnalyzableLog(AnalysisType.SsoEventData, message);
         }
-    
+
         return new AnalyzableLog(AnalysisType.NotApplicable);
     }
 }
@@ -35,6 +35,7 @@ export enum AnalysisType {
     SsoEventData = 1,
 }
 
+// tslint:disable-next-line: max-classes-per-file
 export class AnalyzableLog {
     public analysisType: AnalysisType;
     public fullLogLine: string;
@@ -45,11 +46,12 @@ export class AnalyzableLog {
     }
 }
 
+// tslint:disable-next-line: max-classes-per-file
 export class Analysis {
-    overallStatus: string;
+    public overallStatus: string;
     private pExplanation: string[] = [];
 
-    appendExplanation(additionalExplanation: string) {
+    public appendExplanation(additionalExplanation: string) {
         if (!additionalExplanation) {
             return;
         }
@@ -57,7 +59,7 @@ export class Analysis {
         this.pExplanation.push(additionalExplanation);
     }
 
-    getExplanation(): string {
+    public getExplanation(): string {
         return this.pExplanation.join("\n");
     }
 }

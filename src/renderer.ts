@@ -1,16 +1,18 @@
 import { ipcRenderer } from "electron";
 
-ipcRenderer.on('data', (_event: any, data: {}[]) => {
+ipcRenderer.on("data", (event: any, data: Array<{}>) => {
     showTable(data);
 });
 
-ipcRenderer.on('debugData', (_event: any, data: string[]) => {
+ipcRenderer.on("debugData", (event: any, data: string[]) => {
+    // tslint:disable-next-line: no-console
     console.log(JSON.stringify(data));
 });
 
-function showTable(logLines: {}[]) {
+function showTable(logLines: Array<{}>) {
     const Tabulator = require("tabulator-tables");
     const table = new Tabulator("#logs-table", {
+        autoResize: true,
         columns: [
             {title: "Date", field: "date"},
             {title: "PID", field: "pid"},
@@ -18,8 +20,7 @@ function showTable(logLines: {}[]) {
             {title: "Message", field: "message"},
         ],
         groupBy: "pid",
-        groupStartOpen:true,
-        autoResize:true
+        groupStartOpen: true,
     });
 
     table.setData(logLines);
@@ -27,9 +28,9 @@ function showTable(logLines: {}[]) {
 
 document.ondragover = document.ondrop = (ev) => {
     ev.preventDefault();
-}
-  
+};
+
 document.body.ondrop = (ev) => {
-    ipcRenderer.send('fileLocation', ev.dataTransfer.files[0].path);
+    ipcRenderer.send("fileLocation", ev.dataTransfer.files[0].path);
     ev.preventDefault();
-}
+};
