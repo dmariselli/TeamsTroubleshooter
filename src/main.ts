@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Menu, shell, dialog } from "electron";
+import { app, BrowserWindow, dialog, Menu, shell } from "electron";
 import * as path from "path";
 import * as AppStart from "./lib/appStart";
 
@@ -13,7 +13,7 @@ const template = [{
         // on reload, start fresh and close any old
         // open secondary windows
         if (focusedWindow.id === 1) {
-          BrowserWindow.getAllWindows().forEach(win => {
+          BrowserWindow.getAllWindows().forEach((win) => {
             if (win.id > 1) {
               win.close();
             }
@@ -48,7 +48,7 @@ const template = [{
     })(),
     click: (item: any, focusedWindow: { toggleDevTools: () => void; }) => {
       if (focusedWindow) {
-        focusedWindow.toggleDevTools()
+        focusedWindow.toggleDevTools();
       }
     },
     label: "Toggle Developer Tools",
@@ -63,7 +63,7 @@ const template = [{
           title: "App Version",
           type: "info",
         };
-        dialog.showMessageBox(focusedWindow, options, () => {});
+        dialog.showMessageBox(focusedWindow, options);
       }
     },
     label: "App Version",

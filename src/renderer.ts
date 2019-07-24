@@ -1,6 +1,6 @@
 import { ipcRenderer } from "electron";
 
-ipcRenderer.on("data", (event: any, data: {}[]) => {
+ipcRenderer.on("data", (event: any, data: Array<{}>) => {
     showTable(data);
 });
 
@@ -9,7 +9,7 @@ ipcRenderer.on("debugData", (event: any, data: string[]) => {
     console.log(JSON.stringify(data));
 });
 
-function showTable(logLines: {}[]) {
+function showTable(logLines: Array<{}>) {
     const Tabulator = require("tabulator-tables");
     const table = new Tabulator("#logs-table", {
         autoResize: true,

@@ -50,7 +50,7 @@ export class SsoEventDataAnalyzer {
                     return `Attempting to acquire the ${result} resource token.`;
                 }
             case "fp":
-                return `The app will ${result === 'n' ? "not" : ""} show a prompt as the default behavior.`;
+                return `The app will ${result === "n" ? "not" : ""} show a prompt as the default behavior.`;
             case "ctx":
                 if (result === "c") {
                     return "No saved context found, creating a new auth context.";
@@ -93,7 +93,7 @@ export class SsoEventDataAnalyzer {
                         `As a result, a prompt may be shown unless there is already one running.`;
             case "fre-upn-win":
                 return `${result === "fre-upn-win-success" ? "Succeeded" : "Failed"} in fetching the UPN from the UPN window.`;
-            case "euV2": 
+            case "euV2":
                 return "Extracting the user profile object from the fetched token.";
             case "ssoUserCookieSet":
                 return `Attempted to set the user object cookie with result ${result === "e=true" ? "success" : result}.`;
@@ -164,7 +164,7 @@ export class SsoEventDataAnalyzer {
                 return "Code is executing the login window promise.";
             case "lwp-status":
                 if (result === "success") {
-                    return "The prompt shown completed successfully."
+                    return "The prompt shown completed successfully.";
                 }
 
                 return `The auth prompt failed to fetch a token with error code '${this.parseErrorCode(result)}'.`;

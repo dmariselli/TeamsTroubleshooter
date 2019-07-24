@@ -35,6 +35,7 @@ export enum AnalysisType {
     SsoEventData = 1,
 }
 
+// tslint:disable-next-line: max-classes-per-file
 export class AnalyzableLog {
     public analysisType: AnalysisType;
     public fullLogLine: string;
@@ -45,11 +46,12 @@ export class AnalyzableLog {
     }
 }
 
+// tslint:disable-next-line: max-classes-per-file
 export class Analysis {
-    overallStatus: string;
+    public overallStatus: string;
     private pExplanation: string[] = [];
 
-    appendExplanation(additionalExplanation: string) {
+    public appendExplanation(additionalExplanation: string) {
         if (!additionalExplanation) {
             return;
         }
@@ -57,7 +59,7 @@ export class Analysis {
         this.pExplanation.push(additionalExplanation);
     }
 
-    getExplanation(): string {
+    public getExplanation(): string {
         return this.pExplanation.join("\n");
     }
 }
