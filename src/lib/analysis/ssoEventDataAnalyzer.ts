@@ -49,8 +49,44 @@ export class ssoEventDataAnalyzer {
                 } else {
                     return `Attempting to acquire the ${result} resource token.`;
                 }
+            case "fp":
+                return `The app will ${result === 'n' ? "not" : ""} show a prompt as the default behavior.`;
+            case "ctx":
+                if (result === "c") {
+                    return "No saved context found, creating a new auth context.";
+                }
+
+                return "Saved auth context from a previous session was found.";
+            case "req_ui_known":
+                return `The error code '${this.parseErrorCode(result)}' was emitted as part of the acquire token call. As a result, we will attempt WIA if possible before showing a prompt.`;
+            case "should_wia":
+                return `WIA will ${result === "false" ? "not" : ""} be attempted as part of this auth flow.`;
+            case "wia_status":
+                return `WIA call returned status code ${result}.`;
+            case "wiaSkipDiffUser":
+                if (result === "true") {
+                    return "WIA was not attempted because the loginHint from the UPN does not match the domain joined user's UPN.";
+                }
+
+                return "";
+            case "no_upn":
+                return "UPN is not present, so cannot attempt WIA. Will instead attempt to show a login prompt.";
+            case "wiaSkipSetting":
+                if (result === "true") {
+                    return "WIA was not attempted because a flag was set to skip it.";
+                }
+
+                return "";
+            case "use_wia":
+                if (result === "s") {
+                    return "WIA was attempted.";
+                } else if (result === "f") {
+                    return "WIA request failed to be made.";
+                }
+
+                return "WIA was attempted.";
             case "ats":
-                return `Acquire token call resulted in status code ${results[0]} and error code ${results[1]}.`;
+                return `Acquire token call resulted in status code '${results[0]}' and error code '${results[1]}'.`;
             case "at":
                 return `The acquire token call failed and requested for user input. As a result, a prompt may be shown unless there is already one running.`;
             case "fre-upn-win":
@@ -77,7 +113,7 @@ export class ssoEventDataAnalyzer {
                 return `${result === 's' ? "Found a" : "Did not find a"} semicolon in the user profile.`;
             case "sso_default_fail":
                 if (results.length === 2) {
-                    return `SSO failed with error code ${results[0]} and status code ${results[1]}.`;
+                    return `SSO failed with error code '${results[0]}' and status code '${results[1]}'.`;
                 }
     
                 this.failureLogCount = 2;
@@ -120,6 +156,22 @@ export class ssoEventDataAnalyzer {
                 return "SSO failed, setting the failure ssoStatus cookie.";
             case "failCookieSet":
                 return "Successfully set the failure ssoStatus cookie.";
+            case "lwp":
+                return "Code is executing the login window promise.";
+            case "lwp-status":
+                if (result === "success") {
+                    return "The prompt shown completed successfully."
+                }
+
+                return `The auth prompt failed to fetch a token with error code '${this.parseErrorCode(result)}'.`;
+            case "sso_catch":
+                return "SSO failed.";
+            case "mt-token-wiapre-token-acqmt-token-wia":
+                if (result === "success") {
+                    return "Silent token fetch succeeded.";
+                }
+
+                return `Silent token fetch of the MT token failed with error code '${this.parseErrorCode(result)}'.`;
             default:
                 if (result) {
                     let indexOfSso = result.indexOf("sso-");
@@ -147,6 +199,25 @@ export class ssoEventDataAnalyzer {
     
                     return `Action taken: ${actionString}.`;
                 }
+        }
+    }
+
+    private parseErrorCode(errorCode: string): string {
+        switch (errorCode) {
+            case "caa10001":
+                return "CAA10001: Need user interface to continue";
+            case "caa2000c":
+                return "CAA2000C: The request requires user interaction";
+            case "caa20064":
+                return "CAA20064: Server returned an unknown error code";
+            case "caa20003":
+                return "CAA20003: Invalid grant";
+            case "4c7":
+                return "4c7: The user cancelled the prompt";
+            case "caa20001":
+                return "CAA20001: The client is not authorized to request an authorization code using this method";
+            default:
+                return errorCode;
         }
     }
 }
