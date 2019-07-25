@@ -47,7 +47,11 @@ document.getElementById("logtable").addEventListener('click',function(){
 
 ipcRenderer.on("debugData", (event: any, data: string[]) => {
     // tslint:disable-next-line: no-console
-    console.log(JSON.stringify(data));
+    if (data.length > 0) {
+        data.forEach((logLine) => {
+            console.log(logLine);
+        });
+    }
 });
 
 function showTable(logLines: Array<{}>) {

@@ -14,8 +14,7 @@ class AppStart {
 
     public start(file: string) {
 
-        // tslint:disable-next-line: max-line-length
-        const regex = /^(\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT[+-]\d{4}) \([A-Za-z .]+\) <(\d+)> -- (\w+) -- (.+)/;
+        const regex = /^(\w{3} \w{3} \d{2} \d{4} \d{2}:\d{2}:\d{2} GMT[+-]\d{4}) [^<]+ <(\d+)> -- (\w+) -- (.+)/;
         let lineCount = 0;
         const allLogs: LogLine[] = [];
         const errors: string[] = [];
@@ -41,6 +40,8 @@ class AppStart {
                         processes.getOrCreateFullProcess(logLine);
                         allLogs.push(logLine);
                     } catch (error) {
+                        console.error("Encountered the following error while parsing a log line: " + error);
+                        console.error("For log line: " + line);
                         allLogs.length > 0 ? allLogs[allLogs.length - 1].appendToMessage(line) : errors.push(line);
                     }
                 })
@@ -57,13 +58,14 @@ class AppStart {
                     const processList = processes.getAllProcesses();
                     const explanationList: string[] = [];
                     processList.forEach((process) => {
-                        if (process.analysis.length > 0) {
-                            explanationList.push(process.analysis[0].getExplanation());
-                        }
+                        process.analysisList.forEach((analysis) => {
+                            explanationList.push(analysis.getExplanation());
+                        });
                     });
 
                     if (errors.length > 0) {
                         // tslint:disable-next-line: no-console
+                        console.error("Found the following errors.");
                         console.error(errors);
                     }
 

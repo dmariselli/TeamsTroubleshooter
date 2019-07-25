@@ -1,14 +1,17 @@
 import { SsoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
+import { LocalStorageAnalyzer } from "./localStorageAnalyzer";
 
 export class Analyzer {
     private ssoEventDataAnalyzer: SsoEventDataAnalyzer;
+    private localStorageAnalyzer: LocalStorageAnalyzer;
 
     constructor() {
         this.ssoEventDataAnalyzer = new SsoEventDataAnalyzer();
+        this.localStorageAnalyzer = new LocalStorageAnalyzer();
     }
 
-    public analyze(logMessage: string): Analysis {
-        const analyzableLog = this.getAnalyzableLogIfApplicable(logMessage);
+    public analyze(logType: string, logMessage: string): Analysis[] {
+        const analyzableLog = this.getAnalyzableLogIfApplicable(logType, logMessage);
         if (!analyzableLog) {
             return;
         }
@@ -16,14 +19,18 @@ export class Analyzer {
         switch (analyzableLog.analysisType) {
             case AnalysisType.SsoEventData:
                 return this.ssoEventDataAnalyzer.analyze(analyzableLog);
+            case AnalysisType.LocalStorage:
+                return this.localStorageAnalyzer.analyze(analyzableLog);
             default:
                 break;
         }
     }
 
-    private getAnalyzableLogIfApplicable(message: string): AnalyzableLog {
+    private getAnalyzableLogIfApplicable(logType: string, message: string): AnalyzableLog {
         if (message.includes("ssoEventData")) {
             return new AnalyzableLog(AnalysisType.SsoEventData, message);
+        } else if (logType === "error" && logType.indexOf("storage.json") > -1) {
+            return new AnalyzableLog(AnalysisType.LocalStorage, message);
         }
 
         return new AnalyzableLog(AnalysisType.NotApplicable);
@@ -33,6 +40,13 @@ export class Analyzer {
 export enum AnalysisType {
     NotApplicable = 0,
     SsoEventData = 1,
+    LocalStorage = 2,
+}
+
+export enum AnalysisLevel {
+    Verbose = 0,
+    Warning = 1,
+    Failure = 2,
 }
 
 // tslint:disable-next-line: max-classes-per-file
@@ -48,8 +62,15 @@ export class AnalyzableLog {
 
 // tslint:disable-next-line: max-classes-per-file
 export class Analysis {
-    public overallStatus: string;
+    public level: AnalysisLevel;
     private pExplanation: string[] = [];
+
+    constructor(level: AnalysisLevel, explanation?: string) {
+        this.level = level;
+        if (explanation) {
+            this.pExplanation.push(explanation);
+        }
+    }
 
     public appendExplanation(additionalExplanation: string) {
         if (!additionalExplanation) {
