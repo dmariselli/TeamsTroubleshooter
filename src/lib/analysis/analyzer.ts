@@ -34,7 +34,7 @@ export class Analyzer {
     private getAnalyzableLogIfApplicable(logType: string, message: string): AnalyzableLog {
         if (message.includes("ssoEventData")) {
             return new AnalyzableLog(AnalysisType.SsoEventData, message);
-        } else if (logType === "error" && logType.indexOf("storage.json") > -1) {
+        } else if (logType === "error" && message.indexOf("storage.json") > -1) {
             return new AnalyzableLog(AnalysisType.LocalStorage, message);
         } else if (message.indexOf("Starting app Teams") > -1 || message.indexOf("Setting app session to") > -1) {
             return new AnalyzableLog(AnalysisType.Metadata, message);
