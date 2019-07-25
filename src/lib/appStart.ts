@@ -81,12 +81,15 @@ class AppStart {
                 explanationList.push(analysis);
             });
 
+            console.log("Warning PIDs:");
             process.warningAnalysisList.forEach((analysis) => {
                 console.log(process.pid);
                 warningExplanationList.push(analysis);
             });
 
+            console.log("Failure PIDs:");
             process.failureAnalysisList.forEach((analysis) => {
+                console.log(process.pid);
                 failureExplanationList.push(analysis);
             });
 

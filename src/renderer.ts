@@ -37,6 +37,7 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
             const relevantProcess = processMap.get(pid);
             updateMetadataBox(relevantProcess);
             updateWarningBox(relevantProcess);
+            updateFailureBox(relevantProcess);
         });
     });
 });
@@ -90,9 +91,33 @@ function updateMetadataBox(process: Process) {
 }
 
 function updateWarningBox(process: Process) {
-    const warningBox = document.getElementById("warningText");
-    const warningText = process.warningAnalysisList.length > 0 ? process.warningAnalysisList.join("<br>") : "N/A";
-    warningBox.innerHTML = warningText;
+    const warningBox = document.getElementById("analysisbody2");
+    const warningList: string[] = [];
+
+    if (process.warningAnalysisList.length > 0) {
+        process.warningAnalysisList.forEach((element) => {
+            warningList.push(`<li>${element}</li>`);
+        });
+    } else {
+        warningList.push("N/A");
+    }
+
+    warningBox.innerHTML = warningList.join("");
+}
+
+function updateFailureBox(process: Process) {
+    const failureBox = document.getElementById("analysisbody1");
+    const failureList: string[] = [];
+
+    if (process.failureAnalysisList.length > 0) {
+        process.failureAnalysisList.forEach((element) => {
+            failureList.push(`<li>${element}</li>`);
+        });
+    } else {
+        failureList.push("N/A");
+    }
+
+    failureBox.innerHTML = failureList.join("");
 }
 
 function showTable(logLines: Array<{}>) {

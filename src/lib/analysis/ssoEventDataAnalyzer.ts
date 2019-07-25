@@ -125,7 +125,8 @@ export class SsoEventDataAnalyzer {
             case "fallback":
                 return new Analysis(isSuccess ? AnalysisLevel.Warning : AnalysisLevel.Failure,
                     `UPN was missing from storage.json. ${isSuccess ? "Succeeded" : "Failed"} in finding the ` +
-                    `UPN from either storage.json entry of homeUserUpn or through the domain joined credentials.`);
+                    `UPN from either storage.json entry of homeUserUpn or through the domain joined credentials. ` +
+                    `This can result in an unnecessary prompts or unexpected behavior.`);
             case "ctx":
                 if (result === "c") {
                     return new Analysis(AnalysisLevel.Verbose, "No saved context found, creating a new auth context.");
@@ -287,10 +288,10 @@ export class SsoEventDataAnalyzer {
                     return new Analysis(AnalysisLevel.Verbose, "The prompt shown completed successfully.");
                 }
 
-                return new Analysis(AnalysisLevel.Verbose,
+                return new Analysis(AnalysisLevel.Failure,
                     `The auth prompt failed to fetch a token with error code '${this.parseErrorCode(result)}'.`);
             case "sso_catch":
-                return new Analysis(AnalysisLevel.Verbose, "SSO failed.");
+                return new Analysis(AnalysisLevel.Failure, "SSO failed.");
             case "mt-token-wiapre-token-acqmt-token-wia":
                 if (result === "success") {
                     return new Analysis(AnalysisLevel.Verbose, "Silent token fetch succeeded.");
