@@ -1,14 +1,32 @@
+import * as admZip from "adm-zip";
 import { ipcMain } from "electron";
 import * as eventStream from "event-stream";
 import * as fs from "fs";
+import * as fsExtra from "fs-extra";
 import { ITabularCompatibleData, LogLine } from "./logLine";
 import { Processes } from "./processes";
 import * as Utilities from "./utilities";
 
 class AppStart {
+    private tmpFolderForUnzippedFilePath: string;
+    private logsFileName = "logs.txt";
+
     constructor() {
         ipcMain.on("fileLocation", (event: any, data: string) => {
+            console.log(data);
             this.start(data);
+        });
+
+        ipcMain.on("zipFilePack", (event: any, data: string[]) => {
+            if (data) {
+                let zipFilePath = data[data.length - 1];
+                let zipper = new admZip(zipFilePath);
+                let unzipFolderPath = data[0] + "\\" + "fileUnzipped";
+                this.tmpFolderForUnzippedFilePath = unzipFolderPath;
+                zipper.extractAllTo(unzipFolderPath, true);
+                let logFilePath = unzipFolderPath + "\\" + this.logsFileName;
+                this.start(logFilePath);
+            }
         });
     }
 
@@ -68,6 +86,12 @@ class AppStart {
                     Utilities.getWindow().webContents.send("processes", processes.getAllProcesses());
                 }),
             );
+    }
+
+    public deleteTmpFolderForUnzippedFile() {
+        if (fsExtra.pathExistsSync(this.tmpFolderForUnzippedFilePath)) {
+            fsExtra.removeSync(this.tmpFolderForUnzippedFilePath);
+        }
     }
 
     private showDebuggingConsoleLogs(processes: Processes) {

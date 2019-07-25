@@ -1,3 +1,4 @@
+import * as admZip from "adm-zip";
 import * as c3 from "c3";
 import * as d3 from "d3";
 import { ipcRenderer } from "electron";
@@ -6,6 +7,12 @@ import { Process } from "./lib/process";
 let logTableData: any;
 let isFirstTime: boolean = true;
 let processes: Process[];
+
+enum FileType {
+    txt = "txt",
+    zip = "zip",
+    unknown = "",
+}
 
 ipcRenderer.on("data", (event: any, data: Array<{}>) => {
     logTableData = data;
@@ -164,11 +171,45 @@ function showChart(logLines: Array<{}>) {
     document.getElementById("charting-area").style.width = "94%";
 }
 
+function checkFileType(fileName: string, useWindows: boolean): FileType {
+    const fileNameArray = fileName.split(".");
+    if (useWindows) {
+        if (fileNameArray[fileNameArray.length - 1] === FileType.txt) {
+            return FileType.txt;
+        } else if (fileNameArray[fileNameArray.length - 1] === FileType.zip) {
+            return FileType.zip;
+        } else {
+            return FileType.unknown;
+        }
+    } else {
+        return FileType.unknown;
+    }
+}
+
+function processFilePath(filePath: string, useWindows: boolean): string[] {
+    if (useWindows) {
+        let filePathArray = filePath.split("\\");
+        let fileName = filePathArray.pop();
+        let dirPath = filePathArray.join("\\");
+        return [dirPath, fileName];
+    } else {
+        return [];
+    }
+}
+
 document.ondragover = document.ondrop = (ev) => {
     ev.preventDefault();
 };
 
 document.body.ondrop = (ev) => {
-    ipcRenderer.send("fileLocation", ev.dataTransfer.files[0].path);
+    const filePath = ev.dataTransfer.files[0].path;
+    const useWindows = process.platform === "darwin" ? false : true;
+    const pathArray = processFilePath(filePath, useWindows);
+    if (checkFileType(pathArray[1], useWindows) === FileType.txt) {
+        ipcRenderer.send("fileLocation", filePath);
+    } else if (checkFileType(pathArray[1], useWindows) === FileType.zip) {
+        pathArray.push(filePath);
+        ipcRenderer.send("zipFilePack", pathArray);
+    }
     ev.preventDefault();
 };
