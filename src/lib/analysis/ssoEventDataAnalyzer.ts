@@ -6,9 +6,6 @@ export class SsoEventDataAnalyzer {
     public analyze(ssoEventDataLog: AnalyzableLog): Analysis[] {
         this.failureLogCount = 0;
         const analysisList: Analysis[] = [];
-        const verboseAnalysis: Analysis = new Analysis(AnalysisLevel.Verbose);
-        const warningAnalysis: Analysis = new Analysis(AnalysisLevel.Warning);
-        const failureAnalysis: Analysis = new Analysis(AnalysisLevel.Failure);
         let ssoEventData = ssoEventDataLog.fullLogLine;
         const statusIndex = ssoEventData.indexOf("::");
 
@@ -16,11 +13,15 @@ export class SsoEventDataAnalyzer {
             return;
         }
 
-        let status = ssoEventData.substring(14, statusIndex);
+        const title = ssoEventData.substring(14, statusIndex);
         ssoEventData = ssoEventData.substring(statusIndex + 2);
+        const marks = ssoEventData.split(";");
+
+        const verboseAnalysis: Analysis = new Analysis(AnalysisLevel.Verbose);
+        const warningAnalysis: Analysis = new Analysis(AnalysisLevel.Warning);
+        const failureAnalysis: Analysis = new Analysis(AnalysisLevel.Failure);
         let analysis: Analysis;
 
-        const marks = ssoEventData.split(";");
         marks.forEach((mark: string) => {
             const colonIndex = mark.indexOf(":");
             if (colonIndex !== -1) {
@@ -43,6 +44,10 @@ export class SsoEventDataAnalyzer {
                     break;
             }
         });
+
+        verboseAnalysis.title = title;
+        warningAnalysis.title = title;
+        failureAnalysis.title = title;
 
         analysisList.push(verboseAnalysis);
         if (warningAnalysis.getExplanation()) {
@@ -162,7 +167,7 @@ export class SsoEventDataAnalyzer {
                 if (result === "s") {
                     return new Analysis(AnalysisLevel.Verbose, "Modern WIA was attempted.");
                 } else if (result === "f") {
-                    return new Analysis(AnalysisLevel.Verbose, "WIA request failed to be made.");
+                    return new Analysis(AnalysisLevel.Warning, "WIA request failed to execute.");
                 }
 
                 return new Analysis(AnalysisLevel.Verbose, "No skip WIA hook was found. Proceeding with WIA attempt.");
@@ -171,17 +176,17 @@ export class SsoEventDataAnalyzer {
                     return new Analysis(AnalysisLevel.Verbose, "WIA was attempted.");
                 }
 
-                return new Analysis(AnalysisLevel.Verbose, "WIA request failed to be made.");
+                return new Analysis(AnalysisLevel.Warning, "WIA request failed to execute.");
             case "wa_logoutskip":
                 return new Analysis(AnalysisLevel.Verbose, "WIA attempt skipped since the user was logged out.");
             case "error_wia":
-                return new Analysis(AnalysisLevel.Verbose, "WIA request failed to be made.");
+                return new Analysis(AnalysisLevel.Verbose, "WIA request failed to execute.");
             case "ats":
                 return new Analysis(AnalysisLevel.Verbose,
                     `Acquire token call resulted in status code '${this.parseErrorCode(results[0])}' ` +
                     `and error code '${this.parseErrorCode(results[1])}'.`);
             case "at":
-                return new Analysis(AnalysisLevel.Verbose,
+                return new Analysis(AnalysisLevel.Warning,
                     `The acquire token call failed and requested for user input. ` +
                         `As a result, a prompt may be shown unless there is already one running.`);
             case "fre-upn-win":
@@ -190,16 +195,16 @@ export class SsoEventDataAnalyzer {
             case "euV2":
                 return new Analysis(AnalysisLevel.Verbose, "Extracting the user profile object from the fetched token.");
             case "ssoUserCookieSet":
-                return new Analysis(AnalysisLevel.Verbose,
+                return new Analysis(isSuccess ? AnalysisLevel.Verbose : AnalysisLevel.Warning,
                     `Attempted to set the user object cookie with result ${isSuccess ? "success" : result}.`);
             case "teamsSSOAuth":
-                return new Analysis(AnalysisLevel.Verbose,
+                return new Analysis(isSuccess ? AnalysisLevel.Verbose : AnalysisLevel.Warning,
                     `Attempted to set the token cookie with result ${isSuccess ? "success" : result}.`);
             case "ssoStatusCookieSet":
-                return new Analysis(AnalysisLevel.Verbose,
+                return new Analysis(isSuccess ? AnalysisLevel.Verbose : AnalysisLevel.Warning,
                     `Attempted to set the ssoStatus cookie with result ${isSuccess ? "success" : result}.`);
             case "aggCookie":
-                return new Analysis(AnalysisLevel.Verbose,
+                return new Analysis(isSuccess ? AnalysisLevel.Verbose : AnalysisLevel.Warning,
                     `Attempted to set the Chat Service Aggregator cookie with result ${isSuccess ? "success" : result}.`);
             case "removecookie":
                 return new Analysis(AnalysisLevel.Verbose, "Failed to remove auth cookies.");
@@ -216,7 +221,7 @@ export class SsoEventDataAnalyzer {
                 return new Analysis(AnalysisLevel.Verbose,
                     `${isSuccess ? "Succeeded" : "Failed"} in adding/updating the user object to the async user map.`);
             case "detectSemicolon":
-                return new Analysis(AnalysisLevel.Verbose,
+                return new Analysis(isSuccess ? AnalysisLevel.Warning : AnalysisLevel.Verbose,
                     `${isSuccess ? "Found a" : "Did not find a"} semicolon in the user profile.`);
             case "addToMap":
                 return new Analysis(AnalysisLevel.Verbose,
@@ -232,7 +237,7 @@ export class SsoEventDataAnalyzer {
                     `ADAL version regkey (used by Outlook Add-in).`);
             case "sso_default_fail":
                 if (results.length === 2) {
-                    return new Analysis(AnalysisLevel.Verbose,
+                    return new Analysis(AnalysisLevel.Failure,
                         `SSO failed with error code '${results[0]}' and status code '${results[1]}'.`);
                 }
 
@@ -272,17 +277,17 @@ export class SsoEventDataAnalyzer {
             case "reject":
                 return new Analysis(AnalysisLevel.Verbose, "Failed to completely remove the cookies.");
             case "authAsync":
-                return new Analysis(AnalysisLevel.Verbose, "Attempting to start the app in Offline/LBW flow.");
+                return new Analysis(AnalysisLevel.Warning, "Attempting to start the app in Offline/LBW flow.");
             case "authInit":
-                return new Analysis(AnalysisLevel.Verbose, "Offline/LBW flow failed, so attempting to launch the app regularly.");
+                return new Analysis(AnalysisLevel.Failure, "Offline/LBW flow failed, so attempting to launch the app regularly.");
             case "setFailCookie":
                 return new Analysis(AnalysisLevel.Verbose, "SSO failed, setting the failure ssoStatus cookie.");
             case "failCookieSet":
                 return new Analysis(AnalysisLevel.Verbose, "Successfully set the failure ssoStatus cookie.");
             case "err=Error":
-                return new Analysis(AnalysisLevel.Verbose, `The following error was thrown during the auth flow. '${result}'.`);
+                return new Analysis(AnalysisLevel.Failure, `The following error was thrown during the auth flow. '${result}'.`);
             case "lwp":
-                return new Analysis(AnalysisLevel.Verbose, "Code is executing the login window promise.");
+                return new Analysis(AnalysisLevel.Warning, "Code is executing the login window promise.");
             case "lwp-status":
                 if (result === "success") {
                     return new Analysis(AnalysisLevel.Verbose, "The prompt shown completed successfully.");

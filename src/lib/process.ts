@@ -5,13 +5,17 @@ export class Process {
     public pid: string;
     public logLines: LogLine[] = [];
     public adalVersion: string;
-    public verboseAnalysisList: string[] = [];
-    public warningAnalysisList: string[] = [];
-    public failureAnalysisList: string[] = [];
+    public verboseAnalysisList: string[][] = [];
+    public warningAnalysisList: string[][] = [];
+    public failureAnalysisList: string[][] = [];
+    public verboseAnalysisFormatted: string;
+    public warningAnalysisFormatted: string;
+    public failureAnalysisFormatted: string;
     public appVersion: string = "N/A";
     public webClientSessions: string[] = [];
     public appLaunchReason: string = "N/A";
     private webClientSessionMap = new Map();
+    private analysisList: Analysis[] = [];
 
     constructor(pid: string) {
         this.pid = pid;
@@ -29,20 +33,43 @@ export class Process {
 
     public addAnalysis(analysisList: Analysis[]) {
         analysisList.forEach((analysis) => {
-            if (analysis.level === AnalysisLevel.Verbose) {
-                this.verboseAnalysisList.push(analysis.getExplanation());
-            } else if (analysis.level === AnalysisLevel.Warning) {
-                this.warningAnalysisList.push(analysis.getExplanation());
-            } else if (analysis.level === AnalysisLevel.Failure) {
-                this.failureAnalysisList.push(analysis.getExplanation());
-            } else if (analysis.level === AnalysisLevel.Metadata) {
-                this.processMetadataAnalysis(analysis);
-            }
+            this.analysisList.push(analysis);
         });
     }
 
     public getMetadata(): IProcessMetadata {
         return { "App Version": this.appVersion, "App Launch Reason": this.appLaunchReason, "Web Client Sessions": this.webClientSessions };
+    }
+
+    public completeAnalysis(): void {
+        this.analysisList.forEach((analysis) => {
+            if (analysis.level === AnalysisLevel.Verbose) {
+                this.verboseAnalysisList.push(analysis.explanation);
+            } else if (analysis.level === AnalysisLevel.Warning) {
+                const analysisExplanationList: string[] = [];
+                analysis.explanation.forEach((item) => {
+                    analysisExplanationList.push(`<li>${item}</li>`);
+                });
+                this.warningAnalysisFormatted = `<li>${analysis.title}:</li><ul>${analysisExplanationList.join("")}</ul>`;
+                this.warningAnalysisList.push(analysis.explanation);
+            } else if (analysis.level === AnalysisLevel.Failure) {
+                const analysisExplanationList: string[] = [];
+                analysis.explanation.forEach((item) => {
+                    analysisExplanationList.push(`<li>${item}</li>`);
+                });
+                this.failureAnalysisFormatted = `<li>${analysis.title}:</li><ul>${analysisExplanationList.join("")}</ul>`;
+                this.failureAnalysisList.push(analysis.explanation);
+            } else if (analysis.level === AnalysisLevel.Metadata) {
+                this.processMetadataAnalysis(analysis);
+            }
+        });
+
+        if (!this.warningAnalysisFormatted) {
+            this.warningAnalysisFormatted = "N/A";
+        }
+        if (!this.failureAnalysisFormatted) {
+            this.failureAnalysisFormatted = "N/A";
+        }
     }
 
     private processMetadataAnalysis(analysis: Analysis) {

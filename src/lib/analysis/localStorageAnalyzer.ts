@@ -3,8 +3,9 @@ import { Analysis, AnalysisLevel, AnalyzableLog } from "./analyzer";
 export class LocalStorageAnalyzer {
 
     public analyze(localStorageLog: AnalyzableLog): Analysis[] {
-        const fullLogLine = localStorageLog.fullLogLine;
-        return [this.transformLocalStorageEntry(fullLogLine)];
+        const analysis = this.transformLocalStorageEntry(localStorageLog.fullLogLine);
+        analysis.title = "Local Storage";
+        return [ analysis ];
     }
 
     public transformLocalStorageEntry(fullLogLine: string): Analysis {

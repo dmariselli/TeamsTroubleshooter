@@ -84,7 +84,7 @@ function updateMetadataBox(process: Process) {
             webClientSessionsList.push(`<li>${element}</li>`);
         });
 
-        metadataList.push(`<ul>${webClientSessionsList}</ul>`);
+        metadataList.push(`<ul>${webClientSessionsList.join("")}</ul>`);
     }
 
     metadataBox.innerHTML = metadataList.join("");
@@ -92,32 +92,12 @@ function updateMetadataBox(process: Process) {
 
 function updateWarningBox(process: Process) {
     const warningBox = document.getElementById("analysisbody2");
-    const warningList: string[] = [];
-
-    if (process.warningAnalysisList.length > 0) {
-        process.warningAnalysisList.forEach((element) => {
-            warningList.push(`<li>${element}</li>`);
-        });
-    } else {
-        warningList.push("N/A");
-    }
-
-    warningBox.innerHTML = warningList.join("");
+    warningBox.innerHTML = process.warningAnalysisFormatted;
 }
 
 function updateFailureBox(process: Process) {
     const failureBox = document.getElementById("analysisbody1");
-    const failureList: string[] = [];
-
-    if (process.failureAnalysisList.length > 0) {
-        process.failureAnalysisList.forEach((element) => {
-            failureList.push(`<li>${element}</li>`);
-        });
-    } else {
-        failureList.push("N/A");
-    }
-
-    failureBox.innerHTML = failureList.join("");
+    failureBox.innerHTML = process.failureAnalysisFormatted;
 }
 
 function showTable(logLines: Array<{}>) {

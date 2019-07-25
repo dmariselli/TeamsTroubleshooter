@@ -39,4 +39,10 @@ export class Processes {
 
         return process;
     }
+
+    public completeAnalysis(): void {
+        this.getAllProcesses().forEach((process) => {
+            process.completeAnalysis();
+        });
+    }
 }
