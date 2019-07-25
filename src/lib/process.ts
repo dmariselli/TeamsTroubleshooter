@@ -1,4 +1,4 @@
-import { Analysis, AnalysisLevel } from "./analysis/analyzer";
+import { Analysis, AnalysisLevel, IProcessMetadata } from "./analysis/analyzer";
 import { LogLine } from "./logLine";
 
 export class Process {
@@ -10,8 +10,8 @@ export class Process {
     public failureAnalysisList: Analysis[] = [];
     private webClientSessions: string[] = [];
     private webClientSessionMap = new Map();
-    private appVersion: string;
-    private appLaunchReason: string;
+    private appVersion: string = "N/A";
+    private appLaunchReason: string = "N/A";
 
     constructor(pid: string) {
         this.pid = pid;
@@ -41,7 +41,7 @@ export class Process {
         });
     }
 
-    public getMetadata() {
+    public getMetadata(): IProcessMetadata {
         return { "App Version": this.appVersion, "App Launch Reason": this.appLaunchReason, "Web Client Sessions": this.webClientSessions };
     }
 
@@ -54,8 +54,10 @@ export class Process {
                     break;
                 case "AppLaunchReason":
                     this.appLaunchReason = value;
+                    break;
                 case "WebAppSession":
                     this.addWebClientSession(value);
+                    break;
                 default:
                     break;
             }

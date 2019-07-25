@@ -101,3 +101,7 @@ export class Analysis {
 export interface IMetadataMap {
     [key: string]: string;
 }
+
+export interface IProcessMetadata {
+    [key: string]: string | string[];
+}
