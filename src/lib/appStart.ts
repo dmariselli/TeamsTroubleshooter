@@ -40,8 +40,8 @@ class AppStart {
                         processes.getOrCreateFullProcess(logLine);
                         allLogs.push(logLine);
                     } catch (error) {
-                        console.error("Encountered the following error while parsing a log line: " + error);
-                        console.error("For log line: " + line);
+                        // console.error("Encountered the following error while parsing a log line: " + error);
+                        // console.error("For log line: " + line);
                         allLogs.length > 0 ? allLogs[allLogs.length - 1].appendToMessage(line) : errors.push(line);
                     }
                 })
