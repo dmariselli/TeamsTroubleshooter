@@ -33,15 +33,9 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
         list.appendChild(li);
 
         document.getElementById(process.pid).addEventListener("click", (mouseEvent: MouseEvent) => {
-            const currentPid = mouseEvent.toElement.innerHTML;
-            const metadataBox = document.getElementById("metadataText");
-            const relevantProcess = processMap.get(currentPid);
-            const webClientSessions = relevantProcess.webClientSessions.length > 0 ? relevantProcess.webClientSessions.join(", ") : "N/A";
-            const metadataText = `Process ID: ${currentPid}<br>` +
-                                `App Version: ${relevantProcess.appVersion}<br>` +
-                                `App Launch Reason: ${relevantProcess.appLaunchReason}<br>` +
-                                `Web Client Sessions: ${webClientSessions}<br>`;
-            metadataBox.innerHTML = metadataText;
+            const pid = mouseEvent.toElement.innerHTML;
+            const relevantProcess = processMap.get(pid);
+            updateMetadataBox(relevantProcess);
         });
     });
 });
@@ -69,6 +63,16 @@ ipcRenderer.on("debugData", (event: any, data: string[]) => {
 ipcRenderer.on("logToRenderer", (event: any, data: string) => {
     console.log(data);
 });
+
+function updateMetadataBox(relevantProcess: Process) {
+    const metadataBox = document.getElementById("metadataText");
+    const webClientSessions = relevantProcess.webClientSessions.length > 0 ? relevantProcess.webClientSessions.join(", ") : "N/A";
+    const metadataText = `Process ID: ${relevantProcess.pid}<br>` +
+                        `App Version: ${relevantProcess.appVersion}<br>` +
+                        `App Launch Reason: ${relevantProcess.appLaunchReason}<br>` +
+                        `Web Client Sessions: ${webClientSessions}<br>`;
+    metadataBox.innerHTML = metadataText;
+}
 
 function showTable(logLines: Array<{}>) {
     const Tabulator = require("tabulator-tables");
