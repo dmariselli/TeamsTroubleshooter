@@ -5,7 +5,7 @@ export class Process {
     public pid: string;
     public logLines: LogLine[] = [];
     public adalVersion: string;
-    public analysisList: Analysis[] = [];
+    public verboseAnalysisList: Analysis[] = [];
     public warningAnalysisList: Analysis[] = [];
     public failureAnalysisList: Analysis[] = [];
     private pClientVersions: string[] = [];
@@ -32,7 +32,7 @@ export class Process {
     public addAnalysis(analysisList: Analysis[]) {
         analysisList.forEach((analysis) => {
             if (analysis.level === AnalysisLevel.Verbose) {
-                this.analysisList.push(analysis);
+                this.verboseAnalysisList.push(analysis);
             } else if (analysis.level === AnalysisLevel.Warning) {
                 this.warningAnalysisList.push(analysis);
             } else {
