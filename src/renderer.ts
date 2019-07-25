@@ -40,6 +40,11 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
             updateFailureBox(relevantProcess);
         });
     });
+
+    const mostRecentProcess = processes[processes.length - 1];
+    updateMetadataBox(mostRecentProcess);
+    updateWarningBox(mostRecentProcess);
+    updateFailureBox(mostRecentProcess);
 });
 
 document.getElementById("logtable").addEventListener("click", () => {
