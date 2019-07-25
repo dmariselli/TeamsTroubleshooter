@@ -56,6 +56,7 @@ class AppStart {
                         console.error(errors);
                     }
 
+                    processes.completeAnalysis();
                     this.showDebuggingConsoleLogs(processes);
 
                     const tabularData: ITabularCompatibleData[] = [];
@@ -78,32 +79,38 @@ class AppStart {
 
         processList.forEach((process) => {
             process.verboseAnalysisList.forEach((analysis) => {
-                explanationList.push(analysis);
+                explanationList.push(analysis.join("\n"));
             });
 
-            console.log("Warning PIDs:");
-            process.warningAnalysisList.forEach((analysis) => {
-                console.log(process.pid);
-                warningExplanationList.push(analysis);
-            });
+            if (process.warningAnalysisList.length > 0) {
+                console.log("Warning PIDs:");
+                process.warningAnalysisList.forEach((analysis) => {
+                    console.log(process.pid);
+                    warningExplanationList.push(analysis.join("\n"));
+                });
+            }
 
-            console.log("Failure PIDs:");
-            process.failureAnalysisList.forEach((analysis) => {
-                console.log(process.pid);
-                failureExplanationList.push(analysis);
-            });
+            if (process.failureAnalysisList.length > 0) {
+                console.log("Failure PIDs:");
+                process.failureAnalysisList.forEach((analysis) => {
+                    console.log(process.pid);
+                    failureExplanationList.push(analysis.join("\n"));
+                });
+            }
 
             metadataList.push(JSON.stringify(process.getMetadata()));
         });
 
         Utilities.getWindow().webContents.send("logToRenderer", "Verbose Analysis");
         Utilities.getWindow().webContents.send("debugData", explanationList);
+        /*
         Utilities.getWindow().webContents.send("logToRenderer", "Warning Analysis");
         Utilities.getWindow().webContents.send("debugData", warningExplanationList);
         Utilities.getWindow().webContents.send("logToRenderer", "Failure Analysis");
         Utilities.getWindow().webContents.send("debugData", failureExplanationList);
         Utilities.getWindow().webContents.send("logToRenderer", "Metadata");
         Utilities.getWindow().webContents.send("debugData", metadataList);
+        */
     }
 }
 

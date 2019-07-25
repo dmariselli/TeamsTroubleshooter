@@ -71,9 +71,10 @@ export class AnalyzableLog {
 
 // tslint:disable-next-line: max-classes-per-file
 export class Analysis {
+    public title: string;
     public level: AnalysisLevel;
     public metadata: IMetadataMap;
-    private pExplanation: string[] = [];
+    public explanation: string[] = [];
 
     constructor(level: AnalysisLevel, explanation?: string | IMetadataMap) {
         this.level = level;
@@ -81,7 +82,7 @@ export class Analysis {
         if (level === AnalysisLevel.Metadata) {
             this.metadata = explanation as IMetadataMap;
         } else if (explanation) {
-            this.pExplanation.push(explanation as string);
+            this.explanation.push(explanation as string);
         }
     }
 
@@ -90,11 +91,11 @@ export class Analysis {
             return;
         }
 
-        this.pExplanation.push(additionalExplanation);
+        this.explanation.push(additionalExplanation);
     }
 
     public getExplanation(): string {
-        return this.pExplanation.join("\n");
+        return this.explanation.join("\n");
     }
 }
 
