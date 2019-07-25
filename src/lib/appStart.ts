@@ -74,6 +74,7 @@ class AppStart {
                     });
 
                     Utilities.getWindow().webContents.send("data", tabularData);
+                    Utilities.getWindow().webContents.send("processes", processes.getAllProcesses());
                 }),
             );
     }

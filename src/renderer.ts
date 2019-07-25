@@ -1,10 +1,36 @@
 import { ipcRenderer } from "electron";
+import { Process } from "./lib/process";
+
 let logTableData:any;
 let isFirstTime: boolean = true;
+let processes: Process[];
+
 ipcRenderer.on("data", (event: any, data: Array<{}>) => {
     logTableData = data;
     isFirstTime = true;
     showTable(data);
+});
+
+// For the drop down menu
+ipcRenderer.on("processes", (event: any, data: Process[]) => {
+    console.log(data.length);
+    processes = data;
+    var list = document.getElementById('dropdownmenu');
+    processes.forEach((process: Process) => {
+        var li = document.createElement("li");
+        var a = document.createElement("a");
+        a.setAttribute("id", process.pid);
+        a.setAttribute("class", "pid");
+        var text = document.createTextNode(process.pid);
+        a.appendChild(text);
+        a.href="#";
+        li.appendChild(a);
+        list.appendChild(li);
+
+        document.getElementById(process.pid).addEventListener('click', function(){
+            // Daniel San to Wax on ...Wax off
+        });
+    });
 });
 
 document.getElementById("logtable").addEventListener('click',function(){
@@ -17,6 +43,7 @@ document.getElementById("logtable").addEventListener('click',function(){
             200);
     }
 });
+
 
 ipcRenderer.on("debugData", (event: any, data: string[]) => {
     // tslint:disable-next-line: no-console
