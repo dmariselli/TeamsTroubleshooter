@@ -1,5 +1,5 @@
-import { SsoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
 import { LocalStorageAnalyzer } from "./localStorageAnalyzer";
+import { SsoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
 
 export class Analyzer {
     private ssoEventDataAnalyzer: SsoEventDataAnalyzer;
