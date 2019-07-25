@@ -5,6 +5,7 @@
     <title>Teams Troubleshooter</title>
     <link rel="stylesheet" href="src/contents/bootstrap/css/bootstrap.css" />
     <link href="node_modules/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+    <link href="src/contents/c3.css" rel="stylesheet">
     <script>window.$ = window.jQuery = require('jquery');</script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
  
@@ -14,11 +15,11 @@
   <body>
 
       <div id="bigboypants">
-          <div id="navbar">
+          <div id="navbar" style="background-color: #490367; border-radius: 10px">
               <ul class="nav nav-pills" data-toggle="tab">
-                  <li class="active"><a data-toggle="pill" href="#home" data-toggle="tab">Home</a></li>
-                  <li><a data-toggle="pill" href="#menu1" data-toggle="tab">Analysis Tab</a></li>
-                  <li><a data-toggle="pill" href="#menu2" id="logtable" data-toggle="tab">Logs Table</a></li>
+                  <li class="active"><a data-toggle="pill" href="#home" data-toggle="tab" style="color: honeydew">Home</a></li>
+                  <li><a data-toggle="pill" href="#menu1" data-toggle="tab" style="color: honeydew">Analysis Tab</a></li>
+                  <li><a data-toggle="pill" href="#menu2" id="logtable" data-toggle="tab" style="color: honeydew">Logs Table</a></li>
                 </ul>
           </div>
           <div class="tab-content">
@@ -28,16 +29,23 @@
               </div>
               <div id="menu1" class="tab-pane fade">
                 <h3>Analysis</h3>
-                <p>
-                    <div id="analysisrow">
-                        <div id="analysisblock"></div>
-                        <div id="analysisblock2"></div>
-                        <div id="analysisblock3"></div>
+                <div id="analysisrow">
+                    <div id="analysisblock">
+                      <div class="analysisHeader"><a href="#"><b>Ah! Ah!</b></a></div>
+                      <div class="analysisBody" id="analysisbody1"></div>
                     </div>
-                    <div id="charting-area">
-                      
+                    <div id="analysisblock2">
+                        <div class="analysisHeader"><a href="#"><b>Ah! Ah!</b></a></div>
+                        <div class="analysisBody" id="analysisbody2"></div>
                     </div>
-                </p>
+                    <div id="analysisblock3">
+                        <div class="analysisHeader"><a href="#"><b>Staying Alive!</b></a></div>
+                        <div class="analysisBody" id="analysisbody3"></div>
+                    </div>
+                </div>
+                <div id="charting-area">
+                  
+                </div>
               </div>
               <div id="menu2" class="tab-pane fade">
                 <h3>Logs Table</h3>
