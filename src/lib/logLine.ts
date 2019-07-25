@@ -42,7 +42,9 @@ export class LogLine {
     }
 
     public tabulatorize(): ITabularCompatibleData {
-        return { id: this.logLineNumber, date: this.logDate, pid: this.logPid, type: this.logType, message: this.logMessage };
+        const d = new Date(this.logDate);
+        const formattedDate: string = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDay() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+        return { id: this.logLineNumber, date: formattedDate, pid: this.logPid, type: this.logType, message: this.logMessage };
     }
 }
 
