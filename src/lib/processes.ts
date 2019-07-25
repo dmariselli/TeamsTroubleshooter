@@ -16,6 +16,14 @@ export class Processes {
         return process;
     }
 
+    public getProcess(pid: string): Process {
+        if (this.processMap.has(pid)) {
+            return this.processMap.get(pid);
+        }
+
+        return;
+    }
+
     public getAllProcesses(): Process[] {
         return Array.from(this.processMap.values());
     }

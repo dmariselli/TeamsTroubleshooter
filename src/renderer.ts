@@ -19,7 +19,9 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
     console.log(`Number of processes: ${data.length}`);
     processes = data;
     const list = document.getElementById("dropdownmenu");
+    const processMap = new Map<string, Process>();
     processes.forEach((process: Process) => {
+        processMap.set(process.pid, process);
         const li = document.createElement("li");
         const a = document.createElement("a");
         a.setAttribute("id", process.pid);
@@ -30,8 +32,16 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
         li.appendChild(a);
         list.appendChild(li);
 
-        document.getElementById(process.pid).addEventListener("click", () => {
-            // Daniel San to Wax on ...Wax off
+        document.getElementById(process.pid).addEventListener("click", (mouseEvent: MouseEvent) => {
+            const currentPid = mouseEvent.toElement.innerHTML;
+            const metadataBox = document.getElementById("metadataText");
+            const relevantProcess = processMap.get(currentPid);
+            const webClientSessions = relevantProcess.webClientSessions.length > 0 ? relevantProcess.webClientSessions.join(", ") : "N/A";
+            const metadataText = `Process ID: ${currentPid}<br>` +
+                                `App Version: ${relevantProcess.appVersion}<br>` +
+                                `App Launch Reason: ${relevantProcess.appLaunchReason}<br>` +
+                                `Web Client Sessions: ${webClientSessions}<br>`;
+            metadataBox.innerHTML = metadataText;
         });
     });
 });
@@ -78,47 +88,45 @@ function showTable(logLines: Array<{}>) {
 }
 
 function showChart(logLines: Array<{}>) {
+    const nestedData = d3.nest().key((d: any) => d.date).entries(logLines);
+    const cities = d3.set();
+    const formattedData = nestedData.map((entry) => {
+            const values = entry.values;
+            const obj: any = {};
+            values.forEach ((value: any) => {
+                obj[value.type] = value.id;
+                cities.add(value.type);
+            });
+            obj.date = entry.key;
+            return obj;
+        });
 
-    var nestedData = d3.nest().key(function(d:any) { return d.date; }).entries(logLines);
-      var cities = d3.set();
-      var formattedData = nestedData.map (function (entry) {
-        var values = entry.values;
-        var obj:any = {};
-        values.forEach (function (value:any) {
-          obj[value.type] = value.id;
-          cities.add(value.type);
-        })
-        obj.date = entry.key;
-        return obj;
-      });
-
-      var chart = c3.generate({
-        bindto:"#charting-area",
+    c3.generate({
+        bindto: "#charting-area",
         data: {
             json: formattedData,
-            xFormat: '%Y-%m-%d %H:%M:%S',
+            xFormat: "%Y-%m-%d %H:%M:%S",
             keys: {
-                x: 'date', // it's possible to specify 'x' when category axis
+                x: "date", // it's possible to specify 'x' when category axis
                 value: cities.values(),
             },
-            type: 'scatter'
+            type: "scatter",
         },
         axis: {
             x: {
-                type: 'timeseries',
+                type: "timeseries",
                 tick: {
-                    format: '%Y-%m-%d %H:%M:%S',
-                    count: 10
-                }
-            }
-        }
-        
-      });
+                    format: "%Y-%m-%d %H:%M:%S",
+                    count: 10,
+                },
+            },
+        },
+    });
 
-      document.getElementById("charting-area").style.position = "fixed";
-      document.getElementById("charting-area").style.bottom = "10px";
-      document.getElementById("charting-area").style.left = "3%";
-      document.getElementById("charting-area").style.width = "94%";
+    document.getElementById("charting-area").style.position = "fixed";
+    document.getElementById("charting-area").style.bottom = "10px";
+    document.getElementById("charting-area").style.left = "3%";
+    document.getElementById("charting-area").style.width = "94%";
 }
 
 document.ondragover = document.ondrop = (ev) => {

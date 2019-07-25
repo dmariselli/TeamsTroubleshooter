@@ -8,10 +8,10 @@ export class Process {
     public verboseAnalysisList: Analysis[] = [];
     public warningAnalysisList: Analysis[] = [];
     public failureAnalysisList: Analysis[] = [];
-    private webClientSessions: string[] = [];
+    public appVersion: string = "N/A";
+    public webClientSessions: string[] = [];
+    public appLaunchReason: string = "N/A";
     private webClientSessionMap = new Map();
-    private appVersion: string = "N/A";
-    private appLaunchReason: string = "N/A";
 
     constructor(pid: string) {
         this.pid = pid;
