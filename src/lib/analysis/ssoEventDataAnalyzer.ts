@@ -2,9 +2,11 @@ import { Analysis, AnalysisLevel, AnalyzableLog } from "./analyzer";
 
 export class SsoEventDataAnalyzer {
     private failureLogCount: number = 0;
+    private adalVersion: string = "N/A";
 
     public analyze(ssoEventDataLog: AnalyzableLog): Analysis[] {
         this.failureLogCount = 0;
+        this.adalVersion = "N/A";
         const analysisList: Analysis[] = [];
         let ssoEventData = ssoEventDataLog.fullLogLine;
         const statusIndex = ssoEventData.indexOf("::");
@@ -79,7 +81,7 @@ export class SsoEventDataAnalyzer {
                     return new Analysis(AnalysisLevel.Verbose, `Attempting to acquire the ${result} resource token.`);
                 }
             case "fp":
-                return new Analysis(AnalysisLevel.Verbose,
+                return new Analysis(isSuccess ? AnalysisLevel.Warning : AnalysisLevel.Verbose,
                     `The app will ${isSuccess ? "" : "not"} show a prompt as the default behavior.`);
             case "sfp":
                 return new Analysis(AnalysisLevel.Verbose,
@@ -102,12 +104,17 @@ export class SsoEventDataAnalyzer {
             case "wamDisabled":
                 return new Analysis(AnalysisLevel.Verbose,
                     "WAM is not enabled for this user.");
-            case "adalv:2":
+            case "adalv":
+                if (result === "2") {
+                    this.adalVersion = "2.2";
+                } else if (result === "23") {
+                    this.adalVersion = "2.3";
+                } else {
+                    this.adalVersion = result;
+                }
+
                 return new Analysis(AnalysisLevel.Warning,
-                    "Auth flow will use ADAL 2.2.");
-            case "adalv:23":
-                return new Analysis(AnalysisLevel.Warning,
-                    "Auth flow will use ADAL 2.3.");
+                    `This auth flow is using ADAL ${this.adalVersion}`);
             case "upnOverride":
                 return new Analysis(AnalysisLevel.Failure,
                     "UPN override flag is set. It will now attempt to get a back-up UPN given that the UPN from " +
