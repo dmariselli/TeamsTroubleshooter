@@ -4,6 +4,7 @@ import * as fs from "fs";
 import { ITabularCompatibleData, LogLine } from "./logLine";
 import { Processes } from "./processes";
 import * as Utilities from "./utilities";
+import { Analysis, AnalysisLevel } from "./analysis/analyzer";
 
 class AppStart {
     constructor() {
@@ -20,7 +21,6 @@ class AppStart {
         const errors: string[] = [];
         const processes: Processes = new Processes();
 
-        // tslint:disable-next-line: no-console
         console.time("Log Parsing");
         fs.createReadStream(file)
             .pipe(eventStream.split())
@@ -40,36 +40,47 @@ class AppStart {
                         processes.getOrCreateFullProcess(logLine);
                         allLogs.push(logLine);
                     } catch (error) {
-                        console.error("Encountered the following error while parsing a log line: " + error);
-                        console.error("For log line: " + line);
+                        // console.error("Encountered the following error while parsing a log line: " + error);
+                        // console.error("For log line: " + line);
                         allLogs.length > 0 ? allLogs[allLogs.length - 1].appendToMessage(line) : errors.push(line);
                     }
                 })
                 .on("error", (err) => {
-                    // tslint:disable-next-line: no-console
                     console.error("Error while reading file.", err);
                 })
                 .on("end", () => {
-                    // tslint:disable-next-line: no-console
                     console.timeEnd("Log Parsing");
-                    // tslint:disable-next-line: no-console
                     console.log(`Total number of log lines processed: ${lineCount}.`);
 
                     const processList = processes.getAllProcesses();
                     const explanationList: string[] = [];
+                    const warningExplanationList: string[] = [];
+                    const failureExplanationList: string[] = [];
                     processList.forEach((process) => {
-                        process.analysisList.forEach((analysis) => {
+                        process.verboseAnalysisList.forEach((analysis) => {
                             explanationList.push(analysis.getExplanation());
+                        });
+
+                        process.warningAnalysisList.forEach((analysis) => {
+                            warningExplanationList.push(analysis.getExplanation());
+                        });
+
+                        process.failureAnalysisList.forEach((analysis) => {
+                            failureExplanationList.push(analysis.getExplanation());
                         });
                     });
 
                     if (errors.length > 0) {
-                        // tslint:disable-next-line: no-console
                         console.error("Found the following errors.");
                         console.error(errors);
                     }
 
+                    Utilities.getWindow().webContents.send("logToRenderer", "Verbose Analysis");
                     Utilities.getWindow().webContents.send("debugData", explanationList);
+                    Utilities.getWindow().webContents.send("logToRenderer", "Warning Analysis");
+                    Utilities.getWindow().webContents.send("debugData", warningExplanationList);
+                    Utilities.getWindow().webContents.send("logToRenderer", "Failure Analysis");
+                    Utilities.getWindow().webContents.send("debugData", failureExplanationList);
                     const tabularData: ITabularCompatibleData[] = [];
                     allLogs.forEach((logLine: LogLine) => {
                         tabularData.push(logLine.tabulatorize());

@@ -3,7 +3,7 @@ import * as d3 from "d3";
 import { ipcRenderer } from "electron";
 import { Process } from "./lib/process";
 
-let logTableData:any;
+let logTableData: any;
 let isFirstTime: boolean = true;
 let processes: Process[];
 
@@ -16,31 +16,30 @@ ipcRenderer.on("data", (event: any, data: Array<{}>) => {
 
 // For the drop down menu
 ipcRenderer.on("processes", (event: any, data: Process[]) => {
-    console.log(data.length);
+    console.log(`Number of processes: ${data.length}`);
     processes = data;
-    var list = document.getElementById('dropdownmenu');
+    const list = document.getElementById("dropdownmenu");
     processes.forEach((process: Process) => {
-        var li = document.createElement("li");
-        var a = document.createElement("a");
+        const li = document.createElement("li");
+        const a = document.createElement("a");
         a.setAttribute("id", process.pid);
         a.setAttribute("class", "pid");
-        var text = document.createTextNode(process.pid);
+        const text = document.createTextNode(process.pid);
         a.appendChild(text);
-        a.href="#";
+        a.href = "#";
         li.appendChild(a);
         list.appendChild(li);
 
-        document.getElementById(process.pid).addEventListener('click', function(){
+        document.getElementById(process.pid).addEventListener("click", () => {
             // Daniel San to Wax on ...Wax off
         });
     });
 });
 
-document.getElementById("logtable").addEventListener('click',function(){
-    if(logTableData && isFirstTime) {
-        console.log("Update table");
-        setTimeout(() => 
-            {
+document.getElementById("logtable").addEventListener("click", () => {
+    if (logTableData && isFirstTime) {
+        console.log("Updated table");
+        setTimeout(() => {
                 showTable(logTableData);
                 isFirstTime = false;
             },
@@ -50,12 +49,15 @@ document.getElementById("logtable").addEventListener('click',function(){
 
 
 ipcRenderer.on("debugData", (event: any, data: string[]) => {
-    // tslint:disable-next-line: no-console
     if (data.length > 0) {
         data.forEach((logLine) => {
             console.log(logLine);
         });
     }
+});
+
+ipcRenderer.on("logToRenderer", (event: any, data: string) => {
+    console.log(data);
 });
 
 function showTable(logLines: Array<{}>) {

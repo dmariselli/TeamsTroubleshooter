@@ -1,5 +1,5 @@
-import { SsoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
 import { LocalStorageAnalyzer } from "./localStorageAnalyzer";
+import { SsoEventDataAnalyzer } from "./ssoEventDataAnalyzer";
 
 export class Analyzer {
     private ssoEventDataAnalyzer: SsoEventDataAnalyzer;
@@ -29,7 +29,7 @@ export class Analyzer {
     private getAnalyzableLogIfApplicable(logType: string, message: string): AnalyzableLog {
         if (message.includes("ssoEventData")) {
             return new AnalyzableLog(AnalysisType.SsoEventData, message);
-        } else if (logType === "error" && logType.indexOf("storage.json") > -1) {
+        } else if (logType === "error" && message.indexOf("storage.json") > -1) {
             return new AnalyzableLog(AnalysisType.LocalStorage, message);
         }
 

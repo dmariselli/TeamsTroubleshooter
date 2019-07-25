@@ -1,9 +1,9 @@
-import { Analysis, AnalyzableLog, AnalysisLevel } from "./analyzer";
+import { Analysis, AnalysisLevel, AnalyzableLog } from "./analyzer";
 
 export class LocalStorageAnalyzer {
 
     public analyze(localStorageLog: AnalyzableLog): Analysis[] {
-        let fullLogLine = localStorageLog.fullLogLine;
+        const fullLogLine = localStorageLog.fullLogLine;
         return [this.transformLocalStorageEntry(fullLogLine)];
     }
 
