@@ -40,6 +40,8 @@ class AppStart {
                         processes.getOrCreateFullProcess(logLine);
                         allLogs.push(logLine);
                     } catch (error) {
+                        console.error("Encountered the following error while parsing a log line: " + error);
+                        console.error("For log line: " + line);
                         allLogs.length > 0 ? allLogs[allLogs.length - 1].appendToMessage(line) : errors.push(line);
                     }
                 })
@@ -56,9 +58,9 @@ class AppStart {
                     const processList = processes.getAllProcesses();
                     const explanationList: string[] = [];
                     processList.forEach((process) => {
-                        if (process.analysis.length > 0) {
-                            explanationList.push(process.analysis[0].getExplanation());
-                        }
+                        process.analysisList.forEach((analysis) => {
+                            explanationList.push(analysis.getExplanation());
+                        });
                     });
 
                     if (errors.length > 0) {
