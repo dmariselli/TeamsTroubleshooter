@@ -102,24 +102,24 @@ function showChart(logLines: Array<{}>) {
         });
 
     c3.generate({
+        axis: {
+            x: {
+                tick: {
+                    count: 10,
+                    format: "%Y-%m-%d %H:%M:%S",
+                },
+                type: "timeseries",
+            },
+        },
         bindto: "#charting-area",
         data: {
             json: formattedData,
-            xFormat: "%Y-%m-%d %H:%M:%S",
             keys: {
-                x: "date", // it's possible to specify 'x' when category axis
                 value: cities.values(),
+                x: "date", // it's possible to specify 'x' when category axis
             },
             type: "scatter",
-        },
-        axis: {
-            x: {
-                type: "timeseries",
-                tick: {
-                    format: "%Y-%m-%d %H:%M:%S",
-                    count: 10,
-                },
-            },
+            xFormat: "%Y-%m-%d %H:%M:%S",
         },
     });
 
