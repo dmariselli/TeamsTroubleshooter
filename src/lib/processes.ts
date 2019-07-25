@@ -1,10 +1,11 @@
-import { Analyzer} from "./analysis/analyzer";
+import { Analyzer, Analysis, AnalysisLevel} from "./analysis/analyzer";
 import { LogLine } from "./logLine";
 import { Process } from "./process";
 
 export class Processes {
     private processMap: Map<string, Process> = new Map<string, Process>();
     private analyzer = new Analyzer();
+    
 
     public getOrCreateProcess(pid: string): Process {
         if (this.processMap.has(pid)) {
@@ -22,10 +23,11 @@ export class Processes {
 
     public getOrCreateFullProcess(logLine: LogLine): Process {
         const process = this.getOrCreateProcess(logLine.pid);
-        const analysis = this.analyzer.analyze(logLine.message);
+        const analysisList: Analysis[] = this.analyzer.analyze(logLine.type, logLine.message);
         process.logLines.push(logLine);
-        if (analysis) {
-            process.analysis.push(analysis);
+
+        if (analysisList && analysisList.length > 0) {
+            process.addAnalysis(analysisList);
         }
 
         return process;
