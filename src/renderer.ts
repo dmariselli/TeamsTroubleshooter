@@ -36,6 +36,7 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
             const pid = mouseEvent.toElement.innerHTML;
             const relevantProcess = processMap.get(pid);
             updateMetadataBox(relevantProcess);
+            updateWarningBox(relevantProcess);
         });
     });
 });
@@ -64,14 +65,34 @@ ipcRenderer.on("logToRenderer", (event: any, data: string) => {
     console.log(data);
 });
 
-function updateMetadataBox(relevantProcess: Process) {
-    const metadataBox = document.getElementById("metadataText");
-    const webClientSessions = relevantProcess.webClientSessions.length > 0 ? relevantProcess.webClientSessions.join(", ") : "N/A";
-    const metadataText = `Process ID: ${relevantProcess.pid}<br>` +
-                        `App Version: ${relevantProcess.appVersion}<br>` +
-                        `App Launch Reason: ${relevantProcess.appLaunchReason}<br>` +
-                        `Web Client Sessions: ${webClientSessions}<br>`;
-    metadataBox.innerHTML = metadataText;
+function updateMetadataBox(process: Process) {
+    const metadataBox = document.getElementById("analysisbody3");
+    const hasWebClientSessions = process.webClientSessions.length > 0;
+    const metadataArray = [`Process ID: ${process.pid}`,
+                            `App Version: ${process.appVersion}`,
+                            `App Launch Reason: ${process.appLaunchReason}`,
+                            `Web Client Sessions: ${hasWebClientSessions ? "" : "N/A"}`];
+    const metadataList: string[] = [];
+    metadataArray.forEach((element) => {
+        metadataList.push(`<li>${element}</li>`);
+    });
+
+    if (hasWebClientSessions) {
+        const webClientSessionsList: string[] = [];
+        process.webClientSessions.forEach((element) => {
+            webClientSessionsList.push(`<li>${element}</li>`);
+        });
+
+        metadataList.push(`<ul>${webClientSessionsList}</ul>`);
+    }
+
+    metadataBox.innerHTML = metadataList.join("");
+}
+
+function updateWarningBox(process: Process) {
+    const warningBox = document.getElementById("warningText");
+    const warningText = process.warningAnalysisList.length > 0 ? process.warningAnalysisList.join("<br>") : "N/A";
+    warningBox.innerHTML = warningText;
 }
 
 function showTable(logLines: Array<{}>) {
