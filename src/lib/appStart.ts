@@ -1,7 +1,6 @@
 import { ipcMain } from "electron";
 import * as eventStream from "event-stream";
 import * as fs from "fs";
-import { IProcessMetadata } from "./analysis/analyzer";
 import { ITabularCompatibleData, LogLine } from "./logLine";
 import { Processes } from "./processes";
 import * as Utilities from "./utilities";
@@ -79,15 +78,19 @@ class AppStart {
 
         processList.forEach((process) => {
             process.verboseAnalysisList.forEach((analysis) => {
-                explanationList.push(analysis.getExplanation());
+                explanationList.push(analysis);
             });
 
+            console.log("Warning PIDs:");
             process.warningAnalysisList.forEach((analysis) => {
-                warningExplanationList.push(analysis.getExplanation());
+                console.log(process.pid);
+                warningExplanationList.push(analysis);
             });
 
+            console.log("Failure PIDs:");
             process.failureAnalysisList.forEach((analysis) => {
-                failureExplanationList.push(analysis.getExplanation());
+                console.log(process.pid);
+                failureExplanationList.push(analysis);
             });
 
             metadataList.push(JSON.stringify(process.getMetadata()));

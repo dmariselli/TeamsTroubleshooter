@@ -19,7 +19,9 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
     console.log(`Number of processes: ${data.length}`);
     processes = data;
     const list = document.getElementById("dropdownmenu");
+    const processMap = new Map<string, Process>();
     processes.forEach((process: Process) => {
+        processMap.set(process.pid, process);
         const li = document.createElement("li");
         const a = document.createElement("a");
         a.setAttribute("id", process.pid);
@@ -30,8 +32,12 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
         li.appendChild(a);
         list.appendChild(li);
 
-        document.getElementById(process.pid).addEventListener("click", () => {
-            // Daniel San to Wax on ...Wax off
+        document.getElementById(process.pid).addEventListener("click", (mouseEvent: MouseEvent) => {
+            const pid = mouseEvent.toElement.innerHTML;
+            const relevantProcess = processMap.get(pid);
+            updateMetadataBox(relevantProcess);
+            updateWarningBox(relevantProcess);
+            updateFailureBox(relevantProcess);
         });
     });
 });
@@ -60,6 +66,60 @@ ipcRenderer.on("logToRenderer", (event: any, data: string) => {
     console.log(data);
 });
 
+function updateMetadataBox(process: Process) {
+    const metadataBox = document.getElementById("analysisbody3");
+    const hasWebClientSessions = process.webClientSessions.length > 0;
+    const metadataArray = [`Process ID: ${process.pid}`,
+                            `App Version: ${process.appVersion}`,
+                            `App Launch Reason: ${process.appLaunchReason}`,
+                            `Web Client Sessions: ${hasWebClientSessions ? "" : "N/A"}`];
+    const metadataList: string[] = [];
+    metadataArray.forEach((element) => {
+        metadataList.push(`<li>${element}</li>`);
+    });
+
+    if (hasWebClientSessions) {
+        const webClientSessionsList: string[] = [];
+        process.webClientSessions.forEach((element) => {
+            webClientSessionsList.push(`<li>${element}</li>`);
+        });
+
+        metadataList.push(`<ul>${webClientSessionsList}</ul>`);
+    }
+
+    metadataBox.innerHTML = metadataList.join("");
+}
+
+function updateWarningBox(process: Process) {
+    const warningBox = document.getElementById("analysisbody2");
+    const warningList: string[] = [];
+
+    if (process.warningAnalysisList.length > 0) {
+        process.warningAnalysisList.forEach((element) => {
+            warningList.push(`<li>${element}</li>`);
+        });
+    } else {
+        warningList.push("N/A");
+    }
+
+    warningBox.innerHTML = warningList.join("");
+}
+
+function updateFailureBox(process: Process) {
+    const failureBox = document.getElementById("analysisbody1");
+    const failureList: string[] = [];
+
+    if (process.failureAnalysisList.length > 0) {
+        process.failureAnalysisList.forEach((element) => {
+            failureList.push(`<li>${element}</li>`);
+        });
+    } else {
+        failureList.push("N/A");
+    }
+
+    failureBox.innerHTML = failureList.join("");
+}
+
 function showTable(logLines: Array<{}>) {
     const Tabulator = require("tabulator-tables");
     const table = new Tabulator("#logs-table", {
@@ -78,47 +138,45 @@ function showTable(logLines: Array<{}>) {
 }
 
 function showChart(logLines: Array<{}>) {
+    const nestedData = d3.nest().key((d: any) => d.date).entries(logLines);
+    const cities = d3.set();
+    const formattedData = nestedData.map((entry) => {
+            const values = entry.values;
+            const obj: any = {};
+            values.forEach ((value: any) => {
+                obj[value.type] = value.id;
+                cities.add(value.type);
+            });
+            obj.date = entry.key;
+            return obj;
+        });
 
-    var nestedData = d3.nest().key(function(d:any) { return d.date; }).entries(logLines);
-      var cities = d3.set();
-      var formattedData = nestedData.map (function (entry) {
-        var values = entry.values;
-        var obj:any = {};
-        values.forEach (function (value:any) {
-          obj[value.type] = value.id;
-          cities.add(value.type);
-        })
-        obj.date = entry.key;
-        return obj;
-      });
-
-      var chart = c3.generate({
-        bindto:"#charting-area",
-        data: {
-            json: formattedData,
-            xFormat: '%Y-%m-%d %H:%M:%S',
-            keys: {
-                x: 'date', // it's possible to specify 'x' when category axis
-                value: cities.values(),
-            },
-            type: 'scatter'
-        },
+    c3.generate({
         axis: {
             x: {
-                type: 'timeseries',
                 tick: {
-                    format: '%Y-%m-%d %H:%M:%S',
-                    count: 10
-                }
-            }
-        }
-        
-      });
+                    count: 10,
+                    format: "%Y-%m-%d %H:%M:%S",
+                },
+                type: "timeseries",
+            },
+        },
+        bindto: "#charting-area",
+        data: {
+            json: formattedData,
+            keys: {
+                value: cities.values(),
+                x: "date", // it's possible to specify 'x' when category axis
+            },
+            type: "scatter",
+            xFormat: "%Y-%m-%d %H:%M:%S",
+        },
+    });
 
-      document.getElementById("charting-area").style.position = "fixed";
-      document.getElementById("charting-area").style.bottom = "10px";
-      document.getElementById("charting-area").style.left = "3%";
-      document.getElementById("charting-area").style.width = "94%";
+    document.getElementById("charting-area").style.position = "fixed";
+    document.getElementById("charting-area").style.bottom = "10px";
+    document.getElementById("charting-area").style.left = "3%";
+    document.getElementById("charting-area").style.width = "94%";
 }
 
 document.ondragover = document.ondrop = (ev) => {

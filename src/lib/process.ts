@@ -5,13 +5,13 @@ export class Process {
     public pid: string;
     public logLines: LogLine[] = [];
     public adalVersion: string;
-    public verboseAnalysisList: Analysis[] = [];
-    public warningAnalysisList: Analysis[] = [];
-    public failureAnalysisList: Analysis[] = [];
-    private webClientSessions: string[] = [];
+    public verboseAnalysisList: string[] = [];
+    public warningAnalysisList: string[] = [];
+    public failureAnalysisList: string[] = [];
+    public appVersion: string = "N/A";
+    public webClientSessions: string[] = [];
+    public appLaunchReason: string = "N/A";
     private webClientSessionMap = new Map();
-    private appVersion: string = "N/A";
-    private appLaunchReason: string = "N/A";
 
     constructor(pid: string) {
         this.pid = pid;
@@ -30,11 +30,11 @@ export class Process {
     public addAnalysis(analysisList: Analysis[]) {
         analysisList.forEach((analysis) => {
             if (analysis.level === AnalysisLevel.Verbose) {
-                this.verboseAnalysisList.push(analysis);
+                this.verboseAnalysisList.push(analysis.getExplanation());
             } else if (analysis.level === AnalysisLevel.Warning) {
-                this.warningAnalysisList.push(analysis);
+                this.warningAnalysisList.push(analysis.getExplanation());
             } else if (analysis.level === AnalysisLevel.Failure) {
-                this.failureAnalysisList.push(analysis);
+                this.failureAnalysisList.push(analysis.getExplanation());
             } else if (analysis.level === AnalysisLevel.Metadata) {
                 this.processMetadataAnalysis(analysis);
             }
