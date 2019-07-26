@@ -4302,13 +4302,28 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 
+.tabtitlebar {
+  width: 98%;
+  position: fixed;
+  height:5%;
+}
+
+.tabtitlebar h3 {
+  position:fixed;
+  left:3%;
+  float:left;
+  
+}
+
 #charting-area{
-  height:400px;
-  width:80%;
+  height:40%;
+  width:96%;
   border-radius: 20px;
+  left:2%;
   border-left: 5px solid #490367;
   position:fixed;
-  bottom: 0%;
+  bottom: 3%;
+  background-color: white;
 }
 
 #analysisblock{
@@ -4317,26 +4332,33 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   position:fixed;
   border-left: 5px solid #490367;
   float:left;
+  left: 2%;
+  top:13%;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   border-radius: 20px;
+  background-color: white;
 }
 
 #analysisblock2{
   width:30%;
+  top:13%;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   height:42%;
   position:fixed;
   border-left: 5px solid #490367;
   left: 35%;
   border-radius: 20px;
+  background-color: white;
 }
 
 #analysisblock3{
   width:30%;
+  top:13%;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
   position:fixed;
   border-left: 5px solid #490367;
   border-radius: 20px;
+  background-color: white;
   height:42%;
   right:2%;
 }
@@ -4357,18 +4379,22 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 .analysisBody {
-  width:100;
+  width:98%;
   margin-left:1%;
-  height:88%;
+  height:83%;
+}
+
+#analysisbody3 {
+  overflow-y:scroll;
 }
 #bigboypants{
-  width: 96%;
+  width: 98%;
   height:96%;
-  margin-top:2%;
-  margin-left:2%;
+  margin-top:1%;
+  margin-left:1%;
   margin-right:2%;
   position:fixed;
-  background-color: #F4F4F5;
+  background-color: #EAE9E9;
 }
 .navbar-fixed-top {
   top: 0;

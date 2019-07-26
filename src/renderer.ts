@@ -159,7 +159,7 @@ function showChart(logLines: Array<{}>) {
     });
 
     document.getElementById("charting-area").style.position = "fixed";
-    document.getElementById("charting-area").style.bottom = "10px";
+    document.getElementById("charting-area").style.bottom = "3%";
     document.getElementById("charting-area").style.left = "3%";
     document.getElementById("charting-area").style.width = "94%";
 }
