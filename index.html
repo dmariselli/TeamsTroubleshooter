@@ -37,15 +37,15 @@
                   </div>
                 <div id="analysisrow">
                     <div id="analysisblock">
-                      <div class="analysisHeader"><a href="#"><b>Potential Failures</b></a></div>
+                      <div class="analysisHeader"><a href="#"><b>Potential Failures</b></a><button class="boxCopyButton" id="copyAnalysis1">Copy text</button></div>
                       <div class="analysisBody" id="analysisbody1"></div>
                     </div>
                     <div id="analysisblock2">
-                        <div class="analysisHeader"><a href="#"><b>Warnings</b></a></div>
+                        <div class="analysisHeader"><a href="#"><b>Warnings</b></a><button class="boxCopyButton" id="copyAnalysis2">Copy text</button></div>
                         <div class="analysisBody" id="analysisbody2"></div>
                     </div>
                     <div id="analysisblock3">
-                        <div class="analysisHeader"><a href="#"><b>Metadata</b></a></div>
+                        <div class="analysisHeader"><a href="#"><b>Metadata</b></a><button class="boxCopyButton" id="copyAnalysis3">Copy text</button></div>
                         <div class="analysisBody" id="analysisbody3"></div>
                     </div>
                 </div>
@@ -63,7 +63,7 @@
   </body>
 
     <script>
-      $('#tabs a').on('click', function (e) {
+      $('#tabs a').on('click', (e) => {
         e.preventDefault()
         $(this).tab('show')
       })
