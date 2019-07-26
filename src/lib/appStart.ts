@@ -19,18 +19,18 @@ class AppStart {
 
         ipcMain.on("zipFilePack", (event: any, data: string[]) => {
             if (data) {
-                let zipFilePath = data[data.length - 1];
-                let zipper = new admZip(zipFilePath);
+                const zipFilePath = data[data.length - 1];
+                const zipper = new admZip(zipFilePath);
                 let concatSlash = "";
                 if (process.platform !== "darwin") {
                     concatSlash = "\\";
                 } else {
                     concatSlash = "/";
                 }
-                let unzipFolderPath = data[0] + concatSlash + "fileUnzipped";
+                const unzipFolderPath = data[0] + concatSlash + "fileUnzipped";
                 this.tmpFolderForUnzippedFilePath = unzipFolderPath;
                 zipper.extractAllTo(unzipFolderPath, true);
-                let logFilePath = unzipFolderPath + concatSlash + this.logsFileName;
+                const logFilePath = unzipFolderPath + concatSlash + this.logsFileName;
                 this.start(logFilePath);
             }
         });

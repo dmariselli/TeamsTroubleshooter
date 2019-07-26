@@ -77,6 +77,30 @@ ipcRenderer.on("logToRenderer", (event: any, data: string) => {
     console.log(data);
 });
 
+document.getElementById("copyAnalysis1").addEventListener("click", () => {
+    copyHelper("analysisbody1");
+});
+
+document.getElementById("copyAnalysis2").addEventListener("click", () => {
+    copyHelper("analysisbody2");
+});
+
+document.getElementById("copyAnalysis3").addEventListener("click", () => {
+    copyHelper("analysisbody3");
+});
+
+function copyHelper(id: string) {
+    const elementToCopy = document.getElementById(id);
+    function listener(e: any) {
+        e.clipboardData.setData("text/plain", elementToCopy.innerText);
+        e.preventDefault();
+    }
+
+    document.addEventListener("copy", listener);
+    document.execCommand("copy");
+    document.removeEventListener("copy", listener);
+}
+
 function updateMetadataBox(process: Process) {
     const metadataBox = document.getElementById("analysisbody3");
     const hasWebClientSessions = process.webClientSessions.length > 0;
