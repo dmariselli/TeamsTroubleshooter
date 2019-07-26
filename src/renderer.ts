@@ -25,6 +25,8 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
     console.log(`Number of processes: ${data.length}`);
     processes = data;
     const list = document.getElementById("dropdownmenu");
+    while(list.firstChild) list.removeChild(list.firstChild);
+    
     const processMap = new Map<string, Process>();
     processes.forEach((process: Process) => {
         processMap.set(process.pid, process);
@@ -47,6 +49,7 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
         });
     });
 
+    console.log("UL list"+list.childNodes.length);
     const mostRecentProcess = processes[processes.length - 1];
     updateMetadataBox(mostRecentProcess);
     updateWarningBox(mostRecentProcess);
@@ -190,7 +193,7 @@ function showChart(logLines: Array<{}>) {
     });
 
     document.getElementById("charting-area").style.position = "fixed";
-    document.getElementById("charting-area").style.bottom = "10px";
+    document.getElementById("charting-area").style.bottom = "3%";
     document.getElementById("charting-area").style.left = "3%";
     document.getElementById("charting-area").style.width = "94%";
 }
