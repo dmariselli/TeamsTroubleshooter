@@ -4302,19 +4302,6 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   }
 }
 
-.tabtitlebar {
-  width: 98%;
-  position: fixed;
-  height:5%;
-}
-
-.tabtitlebar h3 {
-  position:fixed;
-  left:3%;
-  float:left;
-  
-}
-
 #charting-area{
   height:40%;
   width:96%;
