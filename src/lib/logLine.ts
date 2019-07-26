@@ -1,4 +1,5 @@
 export class LogLine {
+    public dateTime: Date;
     private logDate: string;
     private logPid: string;
     private logType: string;
@@ -11,6 +12,7 @@ export class LogLine {
         this.logType = type;
         this.logMessage = message;
         this.logLineNumber = lineNumber;
+        this.dateTime = new Date(date);
     }
 
     public get date(): string {
@@ -42,8 +44,8 @@ export class LogLine {
     }
 
     public tabulatorize(): ITabularCompatibleData {
-        const d = new Date(this.logDate);
-        const formattedDate: string = d.getFullYear() + '-' + d.getMonth() + '-' + d.getDay() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+        const formattedDate: string = `${this.dateTime.getFullYear()}-${this.dateTime.getMonth()}-${this.dateTime.getDay()} ` +
+                                        `${this.dateTime.getHours()}:${this.dateTime.getMinutes()}:${this.dateTime.getSeconds()}`;
         return { id: this.logLineNumber, date: formattedDate, pid: this.logPid, type: this.logType, message: this.logMessage };
     }
 }
