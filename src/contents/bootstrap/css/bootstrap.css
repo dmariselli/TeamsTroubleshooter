@@ -4382,11 +4382,9 @@ select[multiple].input-group-sm > .input-group-btn > .btn {
   width:98%;
   margin-left:1%;
   height:83%;
-}
-
-#analysisbody3 {
   overflow-y:scroll;
 }
+
 #bigboypants{
   width: 98%;
   height:96%;
