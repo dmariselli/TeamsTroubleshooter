@@ -7,6 +7,12 @@ let logTableData: any;
 let isFirstTime: boolean = true;
 let processes: Process[];
 
+enum FileType {
+    txt = "txt",
+    zip = "zip",
+    unknown = "",
+}
+
 ipcRenderer.on("data", (event: any, data: Array<{}>) => {
     logTableData = data;
     isFirstTime = true;
@@ -164,11 +170,37 @@ function showChart(logLines: Array<{}>) {
     document.getElementById("charting-area").style.width = "94%";
 }
 
+function checkFileType(fileName: string): FileType {
+    const fileNameArray = fileName.split(".");
+    if (fileNameArray[fileNameArray.length - 1] === FileType.txt) {
+        return FileType.txt;
+    } else if (fileNameArray[fileNameArray.length - 1] === FileType.zip) {
+        return FileType.zip;
+    } else {
+        return FileType.unknown;
+    }
+}
+
+function processFilePath(filePath: string, concater: string): string[] {
+    const filePathArray = filePath.split(concater);
+    const fileName = filePathArray.pop();
+    const dirPath = filePathArray.join(concater);
+    return [dirPath, fileName];
+}
+
 document.ondragover = document.ondrop = (ev) => {
     ev.preventDefault();
 };
 
 document.body.ondrop = (ev) => {
-    ipcRenderer.send("fileLocation", ev.dataTransfer.files[0].path);
+    const filePath = ev.dataTransfer.files[0].path;
+    const concater = process.platform === "darwin" ? "/" : "\\";
+    const pathArray = processFilePath(filePath, concater);
+    if (checkFileType(pathArray[1]) === FileType.txt) {
+        ipcRenderer.send("fileLocation", filePath);
+    } else if (checkFileType(pathArray[1]) === FileType.zip) {
+        pathArray.push(filePath);
+        ipcRenderer.send("zipFilePack", pathArray);
+    }
     ev.preventDefault();
 };
