@@ -75,6 +75,7 @@ function updateMetadataBox(process: Process) {
     const metadataBox = document.getElementById("analysisbody3");
     const hasWebClientSessions = process.webClientSessions.length > 0;
     const metadataArray = [`Process ID: ${process.pid}`,
+                            `Duration: ${process.durationOfSession}`,
                             `App Version: ${process.appVersion}`,
                             `App Launch Reason: ${process.appLaunchReason}`,
                             `Web Client Sessions: ${hasWebClientSessions ? "" : "N/A"}`];

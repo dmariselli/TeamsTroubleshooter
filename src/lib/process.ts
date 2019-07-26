@@ -1,3 +1,4 @@
+import * as moment from "moment";
 import { Analysis, AnalysisLevel, IProcessMetadata } from "./analysis/analyzer";
 import { LogLine } from "./logLine";
 
@@ -14,6 +15,7 @@ export class Process {
     public appVersion: string = "N/A";
     public webClientSessions: string[] = [];
     public appLaunchReason: string = "N/A";
+    public durationOfSession: string;
     private webClientSessionMap = new Map();
     private analysisList: Analysis[] = [];
 
@@ -42,6 +44,9 @@ export class Process {
     }
 
     public completeAnalysis(): void {
+        const momentDiff = this.getSessionDuration(this.logLines);
+        this.durationOfSession = `${Math.floor(momentDiff.asHours())}h ${momentDiff.minutes()}m ${momentDiff.seconds()}s`;
+
         this.analysisList.forEach((analysis) => {
             if (analysis.level === AnalysisLevel.Verbose) {
                 this.verboseAnalysisList.push(analysis.explanation);
@@ -70,6 +75,19 @@ export class Process {
         if (!this.failureAnalysisFormatted) {
             this.failureAnalysisFormatted = "N/A";
         }
+    }
+
+    private getSessionDuration(logLines: LogLine[]): moment.Duration {
+        let minDate: Date = new Date(8640000000000000);
+        let maxDate: Date = new Date(-8640000000000000);
+
+        logLines.forEach((logLine) => {
+            minDate = minDate > logLine.dateTime ? logLine.dateTime : minDate;
+            maxDate = maxDate < logLine.dateTime ? logLine.dateTime : maxDate;
+        });
+
+        const timeDiff = (maxDate as any) - (minDate as any);
+        return moment.duration(timeDiff);
     }
 
     private processMetadataAnalysis(analysis: Analysis) {
