@@ -25,8 +25,8 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
     console.log(`Number of processes: ${data.length}`);
     processes = data;
     const list = document.getElementById("dropdownmenu");
-    while(list.firstChild) list.removeChild(list.firstChild);
-    
+    while (list.firstChild) { list.removeChild(list.firstChild); }
+
     const processMap = new Map<string, Process>();
     processes.forEach((process: Process) => {
         processMap.set(process.pid, process);
@@ -49,7 +49,7 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
         });
     });
 
-    console.log("UL list"+list.childNodes.length);
+    console.log("UL list" + list.childNodes.length);
     const mostRecentProcess = processes[processes.length - 1];
     updateMetadataBox(mostRecentProcess);
     updateWarningBox(mostRecentProcess);
