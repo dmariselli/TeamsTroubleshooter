@@ -21,10 +21,16 @@ class AppStart {
             if (data) {
                 let zipFilePath = data[data.length - 1];
                 let zipper = new admZip(zipFilePath);
-                let unzipFolderPath = data[0] + "\\" + "fileUnzipped";
+                let concatSlash = "";
+                if (process.platform !== "darwin") {
+                    concatSlash = "\\";
+                } else {
+                    concatSlash = "/";
+                }
+                let unzipFolderPath = data[0] + concatSlash + "fileUnzipped";
                 this.tmpFolderForUnzippedFilePath = unzipFolderPath;
                 zipper.extractAllTo(unzipFolderPath, true);
-                let logFilePath = unzipFolderPath + "\\" + this.logsFileName;
+                let logFilePath = unzipFolderPath + concatSlash + this.logsFileName;
                 this.start(logFilePath);
             }
         });
@@ -89,7 +95,8 @@ class AppStart {
     }
 
     public deleteTmpFolderForUnzippedFile() {
-        if (fsExtra.pathExistsSync(this.tmpFolderForUnzippedFilePath)) {
+        if (fs.existsSync(this.tmpFolderForUnzippedFilePath)) {
+            console.log(this.tmpFolderForUnzippedFilePath);
             fsExtra.removeSync(this.tmpFolderForUnzippedFilePath);
         }
     }
