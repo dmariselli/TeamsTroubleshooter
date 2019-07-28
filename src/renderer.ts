@@ -60,7 +60,7 @@ document.getElementById("logtable").addEventListener("click", () => {
     if (logTableData && isFirstTime) {
         console.log("Updated table");
         setTimeout(() => {
-                showTable(logTableData);
+                showTable(logTableData, 2);
                 isFirstTime = false;
             },
             500);
@@ -155,8 +155,9 @@ function showTable(logLines: Array<{}>, scrollToRow?: number) {
 
     
     table.setData(logLines);
-    if (scrollToRow && scrollToRow > 0) {
+    if (scrollToRow) {
         table.scrollToRow(scrollToRow, "top", true);
+        table.redraw(true);
     }
 }
 
