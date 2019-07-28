@@ -44,7 +44,7 @@ export class LogLine {
     }
 
     public tabulatorize(): ITabularCompatibleData {
-        const formattedDate: string = `${this.dateTime.getFullYear()}-${this.dateTime.getMonth()}-${this.dateTime.getDay()} ` +
+        const formattedDate: string = `${this.dateTime.getFullYear()}-${this.dateTime.getMonth() + 1}-${this.dateTime.getDate()} ` +
                                         `${this.dateTime.getHours()}:${this.dateTime.getMinutes()}:${this.dateTime.getSeconds()}`;
         return { id: this.logLineNumber, date: formattedDate, pid: this.logPid, type: this.logType, message: this.logMessage };
     }
