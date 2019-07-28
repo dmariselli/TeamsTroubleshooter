@@ -144,10 +144,10 @@ function showTable(logLines: Array<{}>) {
     const table = new Tabulator("#logs-table", {
         autoResize: true,
         columns: [
-            {title: "Date", field: "date"},
-            {title: "PID", field: "pid"},
-            {title: "Type", field: "type"},
-            {title: "Message", field: "message"},
+            {title: "Date", field: "date", headerFilter: true},
+            {title: "PID", field: "pid", headerFilter: true},
+            {title: "Type", field: "type", headerFilter: true},
+            {title: "Message", field: "message", headerFilter: true},
         ],
         groupBy: "pid",
         groupStartOpen: true,
