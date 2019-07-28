@@ -63,7 +63,7 @@ document.getElementById("logtable").addEventListener("click", () => {
                 showTable(logTableData);
                 isFirstTime = false;
             },
-            1000);
+            500);
     }
 });
 
@@ -139,7 +139,7 @@ function updateFailureBox(process: Process) {
     failureBox.innerHTML = process.failureAnalysisFormatted;
 }
 
-function showTable(logLines: Array<{}>) {
+function showTable(logLines: Array<{}>, scrollToRow?: number) {
     const Tabulator = require("tabulator-tables");
     const table = new Tabulator("#logs-table", {
         autoResize: true,
@@ -153,7 +153,11 @@ function showTable(logLines: Array<{}>) {
         groupStartOpen: true,
     });
 
+    
     table.setData(logLines);
+    if (scrollToRow && scrollToRow > 0) {
+        table.scrollToRow(scrollToRow, "top", true);
+    }
 }
 
 function showChart(logLines: Array<{}>) {
@@ -182,6 +186,7 @@ function showChart(logLines: Array<{}>) {
         },
         bindto: "#charting-area",
         data: {
+            onclick: function (d, element) { chartClickAction(d); },
             json: formattedData,
             keys: {
                 value: cities.values(),
@@ -196,6 +201,16 @@ function showChart(logLines: Array<{}>) {
     document.getElementById("charting-area").style.bottom = "3%";
     document.getElementById("charting-area").style.left = "3%";
     document.getElementById("charting-area").style.width = "94%";
+}
+
+function chartClickAction(data: any) {
+    console.log("Chart:" + data.value);
+    ($("#logtable") as any).tab('show')
+    setTimeout(() => {
+        showTable(logTableData, data.value);
+        isFirstTime = false;
+    },
+    500);
 }
 
 function checkFileType(fileName: string): FileType {
