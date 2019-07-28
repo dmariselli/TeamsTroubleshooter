@@ -6,6 +6,7 @@ import { Process } from "./lib/process";
 let logTableData: any;
 let isFirstTime: boolean = true;
 let processes: Process[];
+let scrollToRowNumber: number = 2;
 
 enum FileType {
     txt = "txt",
@@ -56,16 +57,13 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
     updateFailureBox(mostRecentProcess);
 });
 
-document.getElementById("logtable").addEventListener("click", () => {
+$(document).on('shown.bs.tab', 'a[href="#menu2"]', function (e) {
+    console.log('TAB CHANGED' + scrollToRowNumber);
     if (logTableData && isFirstTime) {
-        console.log("Updated table");
-        setTimeout(() => {
-                showTable(logTableData);
-                isFirstTime = false;
-            },
-            500);
+        showTable(logTableData, scrollToRowNumber);
+        isFirstTime = false;
     }
-});
+})
 
 
 ipcRenderer.on("debugData", (event: any, data: string[]) => {
@@ -155,7 +153,9 @@ function showTable(logLines: Array<{}>, scrollToRow?: number) {
 
     
     table.setData(logLines);
-    if (scrollToRow && scrollToRow > 0) {
+    
+    if (scrollToRow) {
+        table.redraw(true);
         table.scrollToRow(scrollToRow, "top", true);
     }
 }
@@ -205,12 +205,9 @@ function showChart(logLines: Array<{}>) {
 
 function chartClickAction(data: any) {
     console.log("Chart:" + data.value);
+    scrollToRowNumber = data.value;
+    isFirstTime = true;
     ($("#logtable") as any).tab('show')
-    setTimeout(() => {
-        showTable(logTableData, data.value);
-        isFirstTime = false;
-    },
-    500);
 }
 
 function checkFileType(fileName: string): FileType {
