@@ -57,7 +57,6 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
         });
     });
 
-    console.log("UL list" + list.childNodes.length);
     const mostRecentProcess = processes[processes.length - 1];
     analysisTabManager.updateMetadataBox(mostRecentProcess);
     analysisTabManager.updateWarningBox(mostRecentProcess);

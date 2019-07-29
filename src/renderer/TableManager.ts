@@ -21,7 +21,6 @@ export class TableManager {
     public setUpTable(logLines: ITabularCompatibleData[]) {
         this.logTable = this.createNewTable(logLines);
 
-        console.log("scroll: " + this.scrollToRowNumber);
         if (this.scrollToRowNumber > 0) {
             this.logTable.redraw(true);
             this.logTable.scrollToRow(this.scrollToRowNumber, "top", true);
