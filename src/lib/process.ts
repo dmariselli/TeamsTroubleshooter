@@ -18,6 +18,8 @@ export class Process {
     public durationOfSession: string;
     public userInfoRings: string[] = [];
     public switchTenantOperations: string[] = [];
+    public hasWarnings: boolean = false;
+    public hasFailures: boolean = false;
     private webClientSessionMap = new Map();
 
     constructor(pid: string) {
@@ -47,6 +49,14 @@ export class Process {
         }
         if (!this.failureAnalysisFormatted) {
             this.failureAnalysisFormatted = "N/A";
+        }
+    }
+    
+    public addToFailureList(level: AnalysisLevel) {
+        if (level === AnalysisLevel.Warning) {
+            this.hasWarnings = true;
+        } else if (level === AnalysisLevel.Failure) {
+            this.hasFailures = true;
         }
     }
 

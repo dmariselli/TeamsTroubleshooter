@@ -2,6 +2,8 @@ import { Analysis, AnalysisLevel, Analyzer } from "./analysis/analyzer";
 import { LogLine } from "./logLine";
 import { Process } from "./process";
 
+
+
 export class Processes {
     private processMap: Map<string, Process> = new Map<string, Process>();
     private analyzer = new Analyzer();
@@ -31,6 +33,7 @@ export class Processes {
     public getOrCreateFullProcess(logLine: LogLine): Process {
         const process = this.getOrCreateProcess(logLine.pid);
         const analysisList: Analysis[] = this.analyzer.analyze(logLine.type, logLine.message);
+        let isAdded: boolean = false;
 
         if (analysisList) {
             analysisList.forEach((analysis) => {
@@ -40,9 +43,17 @@ export class Processes {
                 } else if (analysis.level === AnalysisLevel.Warning) {
                     process.warningAnalysisFormatted = this.formatHelper(analysis.title, analysis.explanation);
                     process.warningAnalysisList.push(analysis.explanation);
+                    if (!isAdded) {
+                        process.addToFailureList(analysis.level);
+                        isAdded = true;
+                    }
                 } else if (analysis.level === AnalysisLevel.Failure) {
                     process.failureAnalysisFormatted = this.formatHelper(analysis.title, analysis.explanation);
                     process.failureAnalysisList.push(analysis.explanation);
+                    if (!isAdded) {
+                        process.addToFailureList(analysis.level);
+                        isAdded = true;
+                    }
                 } else if (analysis.level === AnalysisLevel.Metadata) {
                     process.processMetadataAnalysis(analysis);
                 }

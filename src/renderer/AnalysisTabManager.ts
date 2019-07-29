@@ -142,7 +142,6 @@ export class AnalysisTabManager {
     }
 
     private chartClickAction(data: any) {
-        console.log("Chart:" + data.value);
         remote.getCurrentWindow().webContents.send("ScrollToRowNumber", data.value);
         remote.getCurrentWindow().webContents.send("UpdateIsFirstTime", true);
         ($("#logtable") as any).tab("show");
