@@ -32,20 +32,22 @@ export class Processes {
         const process = this.getOrCreateProcess(logLine.pid);
         const analysisList: Analysis[] = this.analyzer.analyze(logLine.type, logLine.message);
 
-        analysisList.forEach((analysis) => {
-            if (analysis.level === AnalysisLevel.Verbose) {
-                process.verboseAnalysisList.push(analysis.explanation);
-                logLine.analysis = analysis;
-            } else if (analysis.level === AnalysisLevel.Warning) {
-                process.warningAnalysisFormatted = this.formatHelper(analysis.title, analysis.explanation);
-                process.warningAnalysisList.push(analysis.explanation);
-            } else if (analysis.level === AnalysisLevel.Failure) {
-                process.failureAnalysisFormatted = this.formatHelper(analysis.title, analysis.explanation);
-                process.failureAnalysisList.push(analysis.explanation);
-            } else if (analysis.level === AnalysisLevel.Metadata) {
-                process.processMetadataAnalysis(analysis);
-            }
-        });
+        if (analysisList) {
+            analysisList.forEach((analysis) => {
+                if (analysis.level === AnalysisLevel.Verbose) {
+                    process.verboseAnalysisList.push(analysis.explanation);
+                    logLine.analysis = analysis;
+                } else if (analysis.level === AnalysisLevel.Warning) {
+                    process.warningAnalysisFormatted = this.formatHelper(analysis.title, analysis.explanation);
+                    process.warningAnalysisList.push(analysis.explanation);
+                } else if (analysis.level === AnalysisLevel.Failure) {
+                    process.failureAnalysisFormatted = this.formatHelper(analysis.title, analysis.explanation);
+                    process.failureAnalysisList.push(analysis.explanation);
+                } else if (analysis.level === AnalysisLevel.Metadata) {
+                    process.processMetadataAnalysis(analysis);
+                }
+            });
+        }
 
         process.logLines.push(logLine);
         return process;

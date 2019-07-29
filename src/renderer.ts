@@ -4,10 +4,13 @@ import { ipcRenderer } from "electron";
 import { ITabularCompatibleData } from "./lib/logLine";
 import { Process } from "./lib/process";
 
-const logTable: any = createNewTable();
+let logTableData: any;
+let logTable: any;
+let isFirstTime: boolean = true;
 let processes: Process[];
 let scrollToRowNumber: number = -1;
 const logLineExplanations: Map<number, string> = new Map<number, string>();
+
 
 enum FileType {
     txt = "txt",
@@ -16,7 +19,9 @@ enum FileType {
 }
 
 ipcRenderer.on("data", (event: any, data: ITabularCompatibleData[]) => {
-    setDataToTable(data);
+    logTableData = data;
+    isFirstTime = true;
+    setUpTable(data);
     showChart(data);
 });
 
@@ -63,8 +68,13 @@ ipcRenderer.on("rowExtraData", (event: any, data: ITabularCompatibleData[]) => {
 });
 
 $(document).on("shown.bs.tab", 'a[href="#menu2"]', (e) => {
-    logTable.redraw(true);
-    scrollToRow();
+    console.log("TAB CHANGED" + scrollToRowNumber);
+    scrollToRowNumber = scrollToRowNumber > 0 ? scrollToRowNumber : 1;
+    if (logTableData && isFirstTime) {
+        setUpTable(logTableData);
+        isFirstTime = false;
+        scrollToRowNumber = -1;
+    }
 });
 
 
@@ -91,33 +101,6 @@ document.getElementById("copyAnalysis2").addEventListener("click", () => {
 document.getElementById("copyAnalysis3").addEventListener("click", () => {
     copyHelper("analysisbody3");
 });
-
-function createNewTable() {
-    const Tabulator = require("tabulator-tables");
-    return new Tabulator("#logs-table", {
-        autoResize: true,
-        columns: [
-            {title: "Date", field: "date", headerFilter: true},
-            {title: "PID", field: "pid", headerFilter: true},
-            {title: "Type", field: "type", headerFilter: true},
-            {title: "Message", field: "message", headerFilter: true},
-        ],
-        groupBy: "pid",
-        groupStartOpen: true,
-        layoutColumnsOnNewData: true,
-        rowDblClick: (e: MouseEvent, row: Tabulator.RowComponent) => {
-            if (logLineExplanations.has(row.getData().id)) {
-                alert(logLineExplanations.get(row.getData().id));
-            }
-        },
-    });
-}
-
-function setDataToTable(data: ITabularCompatibleData[]) {
-    logTable.setData(data).then(() => {
-        logTable.redraw(true);
-    });
-}
 
 function copyHelper(id: string) {
     const elementToCopy = document.getElementById(id);
@@ -166,10 +149,33 @@ function updateFailureBox(process: Process) {
     failureBox.innerHTML = process.failureAnalysisFormatted;
 }
 
-function scrollToRow() {
-    if (scrollToRowNumber > -1) {
+function createNewTable(logLines: ITabularCompatibleData[]) {
+    const Tabulator = require("tabulator-tables");
+    return new Tabulator("#logs-table", {
+        autoResize: true,
+        columns: [
+            {title: "Date", field: "date", headerFilter: true},
+            {title: "PID", field: "pid", headerFilter: true},
+            {title: "Type", field: "type", headerFilter: true},
+            {title: "Message", field: "message", headerFilter: true},
+        ],
+        data: logLines,
+        groupBy: "pid",
+        groupStartOpen: true,
+        rowDblClick: (e: MouseEvent, row: Tabulator.RowComponent) => {
+            if (logLineExplanations.has(row.getData().id)) {
+                alert(logLineExplanations.get(row.getData().id));
+            }
+        },
+    });
+}
+
+function setUpTable(logLines: ITabularCompatibleData[]) {
+    logTable = createNewTable(logLines);
+
+    if (scrollToRowNumber > 0) {
+        logTable.redraw(true);
         logTable.scrollToRow(scrollToRowNumber, "top", true);
-        scrollToRowNumber = -1;
     }
 }
 
@@ -219,6 +225,7 @@ function showChart(logLines: ITabularCompatibleData[]) {
 function chartClickAction(data: any) {
     console.log("Chart:" + data.value);
     scrollToRowNumber = data.value;
+    isFirstTime = true;
     ($("#logtable") as any).tab("show");
 }
 

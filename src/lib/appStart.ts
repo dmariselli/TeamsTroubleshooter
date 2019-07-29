@@ -44,7 +44,7 @@ class AppStart {
         const errors: string[] = [];
         const processes: Processes = new Processes();
 
-        console.time("Log Parsing");
+        console.time("Timer - Log Parsing");
         fs.createReadStream(file)
             .pipe(eventStream.split())
             .pipe(
@@ -72,7 +72,7 @@ class AppStart {
                     console.error("Error while reading file.", err);
                 })
                 .on("end", () => {
-                    console.timeEnd("Log Parsing");
+                    console.timeEnd("Timer - Log Parsing");
                     console.log(`Total number of log lines processed: ${lineCount}.`);
 
                     if (errors.length > 0) {
@@ -80,6 +80,7 @@ class AppStart {
                         console.error(errors);
                     }
 
+                    console.time("Timer - Complete Analysis");
                     processes.completeAnalysis();
                     this.showDebuggingConsoleLogs(processes);
 
@@ -91,6 +92,7 @@ class AppStart {
                             explanations.push({ id: logLine.lineNumber, message: logLine.explanation });
                         }
                     });
+                    console.timeEnd("Timer - Complete Analysis");
 
                     Utilities.getWindow().webContents.send("data", tabularData);
                     Utilities.getWindow().webContents.send("rowExtraData", explanations);
