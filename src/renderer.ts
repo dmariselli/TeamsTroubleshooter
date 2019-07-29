@@ -37,6 +37,7 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
 
     const processMap = new Map<string, Process>();
     processes.forEach((process: Process) => {
+
         processMap.set(process.pid, process);
         const li = document.createElement("li");
         const a = document.createElement("a");
@@ -46,6 +47,11 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
         a.appendChild(text);
         a.href = "#";
         li.appendChild(a);
+        if(process.hasFailures) {
+            li.style.backgroundColor = "red";
+        } else if(process.hasWarnings) {
+            li.style.backgroundColor = "orange";
+        }
         list.appendChild(li);
 
         document.getElementById(process.pid).addEventListener("click", (mouseEvent: MouseEvent) => {

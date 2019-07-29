@@ -16,6 +16,8 @@ export class Process {
     public webClientSessions: string[] = [];
     public appLaunchReason: string = "N/A";
     public durationOfSession: string;
+    public hasWarnings: boolean = false;
+    public hasFailures: boolean = false;
     private webClientSessionMap = new Map();
 
     constructor(pid: string) {
@@ -45,6 +47,14 @@ export class Process {
         }
         if (!this.failureAnalysisFormatted) {
             this.failureAnalysisFormatted = "N/A";
+        }
+    }
+    
+    public addToFailureList(level: AnalysisLevel) {
+        if (level === AnalysisLevel.Warning) {
+            this.hasWarnings = true;
+        } else if (level === AnalysisLevel.Failure) {
+            this.hasFailures = true;
         }
     }
 
