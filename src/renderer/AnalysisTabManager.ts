@@ -57,7 +57,7 @@ export class AnalysisTabManager {
     public updateWarningBox(process: Process) {
         const warningBox = document.getElementById("analysisbody2");
         const warningList: string[] = [];
-        const tenantSwitchObject = [`Tenant swich Info:`];
+        const tenantSwitchObject = [`Tenant switch Info:`];
         warningList.push(`<li>${tenantSwitchObject}</li>`);
         const tenantSwitchOperationList: string[] = [];
         const tsOriginList = process.switchTenantOperations;
@@ -71,6 +71,7 @@ export class AnalysisTabManager {
                 tenantSwitchOperationList.push(`<ul>${metaDataObject}</ul>`);
             }
         }
+        warningList.push(`<li>${tenantSwitchOperationList}</li>`);
         const warningAnalysisFormattedObject = process.warningAnalysisFormatted;
         warningList.push(`<li>${warningAnalysisFormattedObject}</li>`);
         warningBox.innerHTML = warningList.join("");
