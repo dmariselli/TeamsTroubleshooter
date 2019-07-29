@@ -57,8 +57,6 @@ export class AnalysisTabManager {
     public updateWarningBox(process: Process) {
         const warningBox = document.getElementById("analysisbody2");
         const warningList: string[] = [];
-        const tenantSwitchObject = [`Tenant switch Info:`];
-        warningList.push(`<li>${tenantSwitchObject}</li>`);
         const tenantSwitchOperationList: string[] = [];
         const tsOriginList = process.switchTenantOperations;
         const ringList = process.userInfoRings;
@@ -72,10 +70,16 @@ export class AnalysisTabManager {
             }
         }
 
-        warningList.push(`<ul>${tenantSwitchOperationList.join("")}</ul>`);
-        if (process.warningAnalysisFormatted !== "N/A") {
-            warningList.push(`<li>${process.warningAnalysisFormatted}</li>`);
+        if (tenantSwitchOperationList.length > 0) {
+            const tenantSwitchObject = [`Tenant switch Info:`];
+            warningList.push(`<li>${tenantSwitchObject}</li>`);
+            warningList.push(`<ul>${tenantSwitchOperationList.join("")}</ul>`);
         }
+
+        if (process.warningAnalysisFormatted !== "N/A") {
+            warningList.push(process.warningAnalysisFormatted);
+        }
+
         warningBox.innerHTML = warningList.join("");
     }
 
