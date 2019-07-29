@@ -16,6 +16,8 @@ export class Process {
     public webClientSessions: string[] = [];
     public appLaunchReason: string = "N/A";
     public durationOfSession: string;
+    public userInfoRings: string[] = [];
+    public switchTenantOperations: string[] = [];
     public hasWarnings: boolean = false;
     public hasFailures: boolean = false;
     private webClientSessionMap = new Map();
@@ -71,6 +73,11 @@ export class Process {
                 case "WebAppSession":
                     this.addWebClientSession(value);
                     break;
+                case "UserRingInfo":
+                    this.userInfoRings.push(value);
+                    break;
+                case "isHomeTenant":
+                    this.switchTenantOperations.push(value);
                 default:
                     break;
             }

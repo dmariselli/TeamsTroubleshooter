@@ -38,6 +38,10 @@ export class Analyzer {
             return new AnalyzableLog(AnalysisType.LocalStorage, message);
         } else if (message.indexOf("Starting app Teams") > -1 || message.indexOf("Setting app session to") > -1) {
             return new AnalyzableLog(AnalysisType.Metadata, message);
+        } else if (message.indexOf("User ring is") > -1) {
+            return new AnalyzableLog(AnalysisType.Metadata, message);
+        } else if (message.indexOf("Switching tenant:") > -1) {
+            return new AnalyzableLog(AnalysisType.Metadata, message);
         }
 
         return new AnalyzableLog(AnalysisType.NotApplicable);

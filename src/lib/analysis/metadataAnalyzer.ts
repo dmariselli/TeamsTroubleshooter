@@ -18,6 +18,14 @@ export class MetadataAnalyzer {
         } else if (fullLogLine.indexOf("Setting app session to") > -1) {
             const webAppSession = fullLogLine.substring(fullLogLine.indexOf("Setting") + 23).trim();
             return new Analysis(AnalysisLevel.Metadata, { WebAppSession: webAppSession});
+        } else if (fullLogLine.indexOf("User ring is") > -1) {
+            const strList = fullLogLine.split(" ");
+            const ringInfo = strList[strList.length - 2];
+            return new Analysis(AnalysisLevel.Metadata, {UserRingInfo: ringInfo});
+        } else if (fullLogLine.indexOf("Switching tenant:") > -1) {
+            const strList = fullLogLine.split(" ");
+            const isHomeTenantVar = strList[4].split(":")[1];
+            return new Analysis(AnalysisLevel.Metadata, { isHomeTenant: isHomeTenantVar});
         }
 
         return;
