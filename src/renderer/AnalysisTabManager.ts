@@ -62,18 +62,20 @@ export class AnalysisTabManager {
         const tenantSwitchOperationList: string[] = [];
         const tsOriginList = process.switchTenantOperations;
         const ringList = process.userInfoRings;
-        let i = 0;
-        for (i = 0; i < tsOriginList.length; i++) {
+
+        for (let i = 0; i < tsOriginList.length; i++) {
             const preRing = process.userInfoRings[i];
             if (i + 1 < ringList.length) {
                 const nextRing = ringList[i + 1];
                 const metaDataObject = [`Switched tenant from ${preRing} to ${nextRing}.`];
-                tenantSwitchOperationList.push(`<ul>${metaDataObject}</ul>`);
+                tenantSwitchOperationList.push(`<li>${metaDataObject}</li>`);
             }
         }
-        warningList.push(`<li>${tenantSwitchOperationList}</li>`);
-        const warningAnalysisFormattedObject = process.warningAnalysisFormatted;
-        warningList.push(`<li>${warningAnalysisFormattedObject}</li>`);
+
+        warningList.push(`<ul>${tenantSwitchOperationList.join("")}</ul>`);
+        if (process.warningAnalysisFormatted !== "N/A") {
+            warningList.push(`<li>${process.warningAnalysisFormatted}</li>`);
+        }
         warningBox.innerHTML = warningList.join("");
     }
 
