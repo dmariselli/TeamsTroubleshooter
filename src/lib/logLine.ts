@@ -1,5 +1,8 @@
+import { Analysis } from "./analysis/analyzer";
+
 export class LogLine {
     public dateTime: Date;
+    public explanation: string;
     private logDate: string;
     private logPid: string;
     private logType: string;
@@ -39,6 +42,10 @@ export class LogLine {
         return this.logLineNumber;
     }
 
+    public set analysis(analysis: Analysis) {
+        this.explanation = analysis.getExplanation();
+    }
+
     public toString(): string {
         return `${this.logLineNumber} ${this.logDate} ${this.logPid} ${this.logType} ${this.logMessage}`;
     }
@@ -52,8 +59,8 @@ export class LogLine {
 
 export interface ITabularCompatibleData {
     id: number;
-    date: string;
-    pid: string;
-    type: string;
-    message: string;
+    date?: string;
+    pid?: string;
+    type?: string;
+    message?: string;
 }

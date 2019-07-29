@@ -1,12 +1,15 @@
-import * as c3 from "c3";
-import * as d3 from "d3";
 import { ipcRenderer } from "electron";
+import { ITabularCompatibleData } from "./lib/logLine";
 import { Process } from "./lib/process";
+import { AnalysisTabManager } from "./renderer/AnalysisTabManager";
+import { TableManager } from "./renderer/TableManager";
 
 let logTableData: any;
 let isFirstTime: boolean = true;
 let processes: Process[];
-let scrollToRowNumber: number = 2;
+
+const tableManager = new TableManager();
+const analysisTabManager = new AnalysisTabManager();
 
 enum FileType {
     txt = "txt",
@@ -14,11 +17,15 @@ enum FileType {
     unknown = "",
 }
 
-ipcRenderer.on("data", (event: any, data: Array<{}>) => {
+ipcRenderer.on("data", (event: any, data: ITabularCompatibleData[]) => {
     logTableData = data;
     isFirstTime = true;
-    showTable(data);
-    showChart(data);
+    tableManager.setUpTable(data);
+    analysisTabManager.showChart(data);
+});
+
+ipcRenderer.on("UpdateIsFirstTime", (event: any, data: boolean) => {
+    isFirstTime = data;
 });
 
 // For the drop down menu
@@ -44,26 +51,27 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
         document.getElementById(process.pid).addEventListener("click", (mouseEvent: MouseEvent) => {
             const pid = mouseEvent.toElement.innerHTML;
             const relevantProcess = processMap.get(pid);
-            updateMetadataBox(relevantProcess);
-            updateWarningBox(relevantProcess);
-            updateFailureBox(relevantProcess);
+            analysisTabManager.updateMetadataBox(relevantProcess);
+            analysisTabManager.updateWarningBox(relevantProcess);
+            analysisTabManager.updateFailureBox(relevantProcess);
         });
     });
 
     console.log("UL list" + list.childNodes.length);
     const mostRecentProcess = processes[processes.length - 1];
-    updateMetadataBox(mostRecentProcess);
-    updateWarningBox(mostRecentProcess);
-    updateFailureBox(mostRecentProcess);
+    analysisTabManager.updateMetadataBox(mostRecentProcess);
+    analysisTabManager.updateWarningBox(mostRecentProcess);
+    analysisTabManager.updateFailureBox(mostRecentProcess);
 });
 
-$(document).on('shown.bs.tab', 'a[href="#menu2"]', function (e) {
-    console.log('TAB CHANGED' + scrollToRowNumber);
+$(document).on("shown.bs.tab", 'a[href="#menu2"]', (e) => {
+    tableManager.scrollToRowNumber = tableManager.scrollToRowNumber > 0 ? tableManager.scrollToRowNumber : 1;
     if (logTableData && isFirstTime) {
-        showTable(logTableData, scrollToRowNumber);
+        tableManager.setUpTable(logTableData);
         isFirstTime = false;
+        tableManager.scrollToRowNumber = -1;
     }
-})
+});
 
 
 ipcRenderer.on("debugData", (event: any, data: string[]) => {
@@ -77,138 +85,6 @@ ipcRenderer.on("debugData", (event: any, data: string[]) => {
 ipcRenderer.on("logToRenderer", (event: any, data: string) => {
     console.log(data);
 });
-
-document.getElementById("copyAnalysis1").addEventListener("click", () => {
-    copyHelper("analysisbody1");
-});
-
-document.getElementById("copyAnalysis2").addEventListener("click", () => {
-    copyHelper("analysisbody2");
-});
-
-document.getElementById("copyAnalysis3").addEventListener("click", () => {
-    copyHelper("analysisbody3");
-});
-
-function copyHelper(id: string) {
-    const elementToCopy = document.getElementById(id);
-    function listener(e: any) {
-        e.clipboardData.setData("text/plain", elementToCopy.innerText);
-        e.preventDefault();
-    }
-
-    document.addEventListener("copy", listener);
-    document.execCommand("copy");
-    document.removeEventListener("copy", listener);
-}
-
-function updateMetadataBox(process: Process) {
-    const metadataBox = document.getElementById("analysisbody3");
-    const hasWebClientSessions = process.webClientSessions.length > 0;
-    const metadataArray = [`Process ID: ${process.pid}`,
-                            `Duration: ${process.durationOfSession}`,
-                            `App Version: ${process.appVersion}`,
-                            `App Launch Reason: ${process.appLaunchReason}`,
-                            `Web Client Sessions: ${hasWebClientSessions ? "" : "N/A"}`];
-    const metadataList: string[] = [];
-    metadataArray.forEach((element) => {
-        metadataList.push(`<li>${element}</li>`);
-    });
-
-    if (hasWebClientSessions) {
-        const webClientSessionsList: string[] = [];
-        process.webClientSessions.forEach((element) => {
-            webClientSessionsList.push(`<li>${element}</li>`);
-        });
-
-        metadataList.push(`<ul>${webClientSessionsList.join("")}</ul>`);
-    }
-
-    metadataBox.innerHTML = metadataList.join("");
-}
-
-function updateWarningBox(process: Process) {
-    const warningBox = document.getElementById("analysisbody2");
-    warningBox.innerHTML = process.warningAnalysisFormatted;
-}
-
-function updateFailureBox(process: Process) {
-    const failureBox = document.getElementById("analysisbody1");
-    failureBox.innerHTML = process.failureAnalysisFormatted;
-}
-
-function showTable(logLines: Array<{}>, scrollToRow?: number) {
-    const Tabulator = require("tabulator-tables");
-    const table = new Tabulator("#logs-table", {
-        autoResize: true,
-        columns: [
-            {title: "Date", field: "date", headerFilter: true},
-            {title: "PID", field: "pid", headerFilter: true},
-            {title: "Type", field: "type", headerFilter: true},
-            {title: "Message", field: "message", headerFilter: true},
-        ],
-        groupBy: "pid",
-        groupStartOpen: true,
-    });
-
-    
-    table.setData(logLines);
-    
-    if (scrollToRow) {
-        table.redraw(true);
-        table.scrollToRow(scrollToRow, "top", true);
-    }
-}
-
-function showChart(logLines: Array<{}>) {
-    const nestedData = d3.nest().key((d: any) => d.date).entries(logLines);
-    const cities = d3.set();
-    const formattedData = nestedData.map((entry) => {
-            const values = entry.values;
-            const obj: any = {};
-            values.forEach ((value: any) => {
-                obj[value.type] = value.id;
-                cities.add(value.type);
-            });
-            obj.date = entry.key;
-            return obj;
-        });
-
-    c3.generate({
-        axis: {
-            x: {
-                tick: {
-                    count: 10,
-                    format: "%Y-%m-%d %H:%M:%S",
-                },
-                type: "timeseries",
-            },
-        },
-        bindto: "#charting-area",
-        data: {
-            onclick: function (d, element) { chartClickAction(d); },
-            json: formattedData,
-            keys: {
-                value: cities.values(),
-                x: "date", // it's possible to specify 'x' when category axis
-            },
-            type: "scatter",
-            xFormat: "%Y-%m-%d %H:%M:%S",
-        },
-    });
-
-    document.getElementById("charting-area").style.position = "fixed";
-    document.getElementById("charting-area").style.bottom = "3%";
-    document.getElementById("charting-area").style.left = "3%";
-    document.getElementById("charting-area").style.width = "94%";
-}
-
-function chartClickAction(data: any) {
-    console.log("Chart:" + data.value);
-    scrollToRowNumber = data.value;
-    isFirstTime = true;
-    ($("#logtable") as any).tab('show')
-}
 
 function checkFileType(fileName: string): FileType {
     const fileNameArray = fileName.split(".");
