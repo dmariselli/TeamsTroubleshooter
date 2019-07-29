@@ -6,7 +6,6 @@ import { Process } from "./lib/process";
 
 let logTableData: any;
 const logTable: any = createNewTable();
-let isFirstTime: boolean = true;
 let processes: Process[];
 let scrollToRowNumber: number = -1;
 const logLineExplanations: Map<number, string> = new Map<number, string>();
@@ -19,7 +18,6 @@ enum FileType {
 
 ipcRenderer.on("data", (event: any, data: ITabularCompatibleData[]) => {
     logTableData = data;
-    isFirstTime = true;
     setDataToTable(data);
     showChart(data);
 });
@@ -67,11 +65,7 @@ ipcRenderer.on("rowExtraData", (event: any, data: ITabularCompatibleData[]) => {
 });
 
 $(document).on("shown.bs.tab", 'a[href="#menu2"]', (e) => {
-    console.log("TAB CHANGED" + scrollToRowNumber);
-    if (logTableData && isFirstTime) {
-        scrollToRow();
-        isFirstTime = false;
-    }
+    scrollToRow();
 });
 
 
@@ -121,8 +115,9 @@ function createNewTable() {
 }
 
 function setDataToTable(data: ITabularCompatibleData[]) {
-    logTable.setData(data);
-    logTable.redraw(true);
+    logTable.setData(data).then(() => {
+        logTable.redraw(true);
+    });
 }
 
 function copyHelper(id: string) {
@@ -225,7 +220,6 @@ function showChart(logLines: ITabularCompatibleData[]) {
 function chartClickAction(data: any) {
     console.log("Chart:" + data.value);
     scrollToRowNumber = data.value;
-    isFirstTime = true;
     ($("#logtable") as any).tab("show");
 }
 
