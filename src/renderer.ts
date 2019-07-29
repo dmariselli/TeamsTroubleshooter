@@ -78,7 +78,6 @@ $(document).on("shown.bs.tab", 'a[href="#menu2"]', (e) => {
     }
 });
 
-
 ipcRenderer.on("debugData", (event: any, data: string[]) => {
     if (data.length > 0) {
         data.forEach((logLine) => {
