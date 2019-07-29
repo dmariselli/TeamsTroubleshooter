@@ -16,6 +16,7 @@ export class Process {
     public webClientSessions: string[] = [];
     public appLaunchReason: string = "N/A";
     public durationOfSession: string;
+    public userInfoRings: string[] = [];
     private webClientSessionMap = new Map();
     private analysisList: Analysis[] = [];
 
@@ -103,6 +104,8 @@ export class Process {
                 case "WebAppSession":
                     this.addWebClientSession(value);
                     break;
+                case "UserRingInfo":
+                    this.userInfoRings.push(value);
                 default:
                     break;
             }

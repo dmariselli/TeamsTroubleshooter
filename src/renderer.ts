@@ -109,7 +109,8 @@ function updateMetadataBox(process: Process) {
                             `Duration: ${process.durationOfSession}`,
                             `App Version: ${process.appVersion}`,
                             `App Launch Reason: ${process.appLaunchReason}`,
-                            `Web Client Sessions: ${hasWebClientSessions ? "" : "N/A"}`];
+                            `Web Client Sessions: ${hasWebClientSessions ? "" : "N/A"}`,
+                            `User Rings: ${process.userInfoRings.length > 0 ? "" : "N/A"} `];
     const metadataList: string[] = [];
     metadataArray.forEach((element) => {
         metadataList.push(`<li>${element}</li>`);
@@ -122,6 +123,15 @@ function updateMetadataBox(process: Process) {
         });
 
         metadataList.push(`<ul>${webClientSessionsList.join("")}</ul>`);
+    }
+
+    if (process.userInfoRings.length > 0) {
+        const ringInfoList: string[] = [];
+        process.userInfoRings.forEach((element) => {
+            ringInfoList.push(`<li>${element}</li>`);
+        });
+
+        metadataList.push(`<ul>${ringInfoList.join("")}</ul>`);
     }
 
     metadataBox.innerHTML = metadataList.join("");
@@ -151,9 +161,7 @@ function showTable(logLines: Array<{}>, scrollToRow?: number) {
         groupStartOpen: true,
     });
 
-    
     table.setData(logLines);
-    
     if (scrollToRow) {
         table.redraw(true);
         table.scrollToRow(scrollToRow, "top", true);
