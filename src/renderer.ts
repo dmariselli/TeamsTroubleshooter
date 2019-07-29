@@ -4,7 +4,6 @@ import { ipcRenderer } from "electron";
 import { ITabularCompatibleData } from "./lib/logLine";
 import { Process } from "./lib/process";
 
-let logTableData: any;
 const logTable: any = createNewTable();
 let processes: Process[];
 let scrollToRowNumber: number = -1;
@@ -17,7 +16,6 @@ enum FileType {
 }
 
 ipcRenderer.on("data", (event: any, data: ITabularCompatibleData[]) => {
-    logTableData = data;
     setDataToTable(data);
     showChart(data);
 });
@@ -65,6 +63,7 @@ ipcRenderer.on("rowExtraData", (event: any, data: ITabularCompatibleData[]) => {
 });
 
 $(document).on("shown.bs.tab", 'a[href="#menu2"]', (e) => {
+    logTable.redraw(true);
     scrollToRow();
 });
 
