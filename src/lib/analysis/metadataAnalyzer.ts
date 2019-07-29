@@ -22,6 +22,10 @@ export class MetadataAnalyzer {
             const strList = fullLogLine.split(" ");
             const ringInfo = strList[strList.length - 2];
             return new Analysis(AnalysisLevel.Metadata, {UserRingInfo: ringInfo});
+        } else if (fullLogLine.indexOf("Switching tenant") > -1) {
+            const strList = fullLogLine.split(" ");
+            const isHomeTenantVar = strList[4].split(":")[1];
+            return new Analysis(AnalysisLevel.Metadata, { isHomeTenant: isHomeTenantVar});
         }
 
         return;

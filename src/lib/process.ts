@@ -17,6 +17,7 @@ export class Process {
     public appLaunchReason: string = "N/A";
     public durationOfSession: string;
     public userInfoRings: string[] = [];
+    public switchTenantOperations: string[] = [];
     private webClientSessionMap = new Map();
 
     constructor(pid: string) {

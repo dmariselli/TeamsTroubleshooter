@@ -27,11 +27,20 @@ export class AnalysisTabManager {
                                 `Duration: ${process.durationOfSession}`,
                                 `App Version: ${process.appVersion}`,
                                 `App Launch Reason: ${process.appLaunchReason}`,
-                                `Web Client Sessions: ${hasWebClientSessions ? "" : "N/A"}`];
+                                `User Ring Info: ${process.userInfoRings.length > 0 ? "" : "N/A"}`];
         const metadataList: string[] = [];
         metadataArray.forEach((element) => {
             metadataList.push(`<li>${element}</li>`);
         });
+        if (process.userInfoRings.length > 0) {
+            const userRingList: string[] = [];
+            process.userInfoRings.forEach((element: string) => {
+                userRingList.push(`<li>${element}</li>`);
+            });
+            metadataList.push(`<ul>${userRingList.join("")}</ul>`);
+        }
+        const metaDataObject = [`Web Client Sessions: ${hasWebClientSessions ? "" : "N/A"}`];
+        metadataList.push(`<li>${metaDataObject}</li>`);
 
         if (hasWebClientSessions) {
             const webClientSessionsList: string[] = [];
