@@ -1,12 +1,15 @@
 import * as c3 from "c3";
 import * as d3 from "d3";
 import { ipcRenderer } from "electron";
+import { ITabularCompatibleData } from "./lib/logLine";
 import { Process } from "./lib/process";
 
 let logTableData: any;
+const logTable: any = createNewTable();
 let isFirstTime: boolean = true;
 let processes: Process[];
-let scrollToRowNumber: number = 2;
+let scrollToRowNumber: number = -1;
+const logLineExplanations: Map<number, string> = new Map<number, string>();
 
 enum FileType {
     txt = "txt",
@@ -14,10 +17,10 @@ enum FileType {
     unknown = "",
 }
 
-ipcRenderer.on("data", (event: any, data: Array<{}>) => {
+ipcRenderer.on("data", (event: any, data: ITabularCompatibleData[]) => {
     logTableData = data;
     isFirstTime = true;
-    showTable(data);
+    setDataToTable(data);
     showChart(data);
 });
 
@@ -57,13 +60,19 @@ ipcRenderer.on("processes", (event: any, data: Process[]) => {
     updateFailureBox(mostRecentProcess);
 });
 
-$(document).on('shown.bs.tab', 'a[href="#menu2"]', function (e) {
-    console.log('TAB CHANGED' + scrollToRowNumber);
+ipcRenderer.on("rowExtraData", (event: any, data: ITabularCompatibleData[]) => {
+    data.forEach((explanation) => {
+        logLineExplanations.set(explanation.id, explanation.message);
+    });
+});
+
+$(document).on("shown.bs.tab", 'a[href="#menu2"]', (e) => {
+    console.log("TAB CHANGED" + scrollToRowNumber);
     if (logTableData && isFirstTime) {
-        showTable(logTableData, scrollToRowNumber);
+        scrollToRow();
         isFirstTime = false;
     }
-})
+});
 
 
 ipcRenderer.on("debugData", (event: any, data: string[]) => {
@@ -89,6 +98,32 @@ document.getElementById("copyAnalysis2").addEventListener("click", () => {
 document.getElementById("copyAnalysis3").addEventListener("click", () => {
     copyHelper("analysisbody3");
 });
+
+function createNewTable() {
+    const Tabulator = require("tabulator-tables");
+    return new Tabulator("#logs-table", {
+        autoResize: true,
+        columns: [
+            {title: "Date", field: "date", headerFilter: true},
+            {title: "PID", field: "pid", headerFilter: true},
+            {title: "Type", field: "type", headerFilter: true},
+            {title: "Message", field: "message", headerFilter: true},
+        ],
+        groupBy: "pid",
+        groupStartOpen: true,
+        layoutColumnsOnNewData: true,
+        rowDblClick: (e: MouseEvent, row: Tabulator.RowComponent) => {
+            if (logLineExplanations.has(row.getData().id)) {
+                alert(logLineExplanations.get(row.getData().id));
+            }
+        },
+    });
+}
+
+function setDataToTable(data: ITabularCompatibleData[]) {
+    logTable.setData(data);
+    logTable.redraw(true);
+}
 
 function copyHelper(id: string) {
     const elementToCopy = document.getElementById(id);
@@ -137,30 +172,14 @@ function updateFailureBox(process: Process) {
     failureBox.innerHTML = process.failureAnalysisFormatted;
 }
 
-function showTable(logLines: Array<{}>, scrollToRow?: number) {
-    const Tabulator = require("tabulator-tables");
-    const table = new Tabulator("#logs-table", {
-        autoResize: true,
-        columns: [
-            {title: "Date", field: "date", headerFilter: true},
-            {title: "PID", field: "pid", headerFilter: true},
-            {title: "Type", field: "type", headerFilter: true},
-            {title: "Message", field: "message", headerFilter: true},
-        ],
-        groupBy: "pid",
-        groupStartOpen: true,
-    });
-
-    
-    table.setData(logLines);
-    
-    if (scrollToRow) {
-        table.redraw(true);
-        table.scrollToRow(scrollToRow, "top", true);
+function scrollToRow() {
+    if (scrollToRowNumber > -1) {
+        logTable.scrollToRow(scrollToRowNumber, "top", true);
+        scrollToRowNumber = -1;
     }
 }
 
-function showChart(logLines: Array<{}>) {
+function showChart(logLines: ITabularCompatibleData[]) {
     const nestedData = d3.nest().key((d: any) => d.date).entries(logLines);
     const cities = d3.set();
     const formattedData = nestedData.map((entry) => {
@@ -186,12 +205,12 @@ function showChart(logLines: Array<{}>) {
         },
         bindto: "#charting-area",
         data: {
-            onclick: function (d, element) { chartClickAction(d); },
             json: formattedData,
             keys: {
                 value: cities.values(),
                 x: "date", // it's possible to specify 'x' when category axis
             },
+            onclick: (d, element) => { chartClickAction(d); },
             type: "scatter",
             xFormat: "%Y-%m-%d %H:%M:%S",
         },
@@ -207,7 +226,7 @@ function chartClickAction(data: any) {
     console.log("Chart:" + data.value);
     scrollToRowNumber = data.value;
     isFirstTime = true;
-    ($("#logtable") as any).tab('show')
+    ($("#logtable") as any).tab("show");
 }
 
 function checkFileType(fileName: string): FileType {

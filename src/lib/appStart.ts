@@ -84,11 +84,16 @@ class AppStart {
                     this.showDebuggingConsoleLogs(processes);
 
                     const tabularData: ITabularCompatibleData[] = [];
+                    const explanations: ITabularCompatibleData[] = [];
                     allLogs.forEach((logLine: LogLine) => {
                         tabularData.push(logLine.tabulatorize());
+                        if (logLine.explanation) {
+                            explanations.push({ id: logLine.lineNumber, message: logLine.explanation });
+                        }
                     });
 
                     Utilities.getWindow().webContents.send("data", tabularData);
+                    Utilities.getWindow().webContents.send("rowExtraData", explanations);
                     Utilities.getWindow().webContents.send("processes", processes.getAllProcesses());
                 }),
             );
