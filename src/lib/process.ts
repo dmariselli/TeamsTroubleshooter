@@ -65,6 +65,8 @@ export class Process {
                     break;
                 case "UserRingInfo":
                     this.userInfoRings.push(value);
+                case "isHomeTenant":
+                    this.switchTenantOperations.push(value);
                 default:
                     break;
             }
